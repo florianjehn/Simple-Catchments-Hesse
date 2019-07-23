@@ -22,12 +22,28 @@ def read_mapping():
         # Skip the header
         mapping.readline()
         for line in mapping.readlines():
-            name, id_river = line.replace(" ", "").split(";")
-            mappings[name] = id_river
+            name, id_river = line.replace("\n","").split(";")
+            mappings[id_river] = name
     return mappings            
-            
 
-def read_HLNUG_discharge():
+
+def read_areas():
+    """
+    reads in the sizes of all catchments and returns them as a dict
+    """
+    os.chdir(file_dir)
+    areas = {}
+    with open("river_areas_m2.csv", "r") as catchments:
+        # Skip the header
+        catchments.readline()
+        for catchment in catchments.readlines():
+            gauge = catchment.split(";")[1]
+            area = catchment.split(";")[2]
+            areas[gauge] = float(area)
+    return areas
+               
+
+def read_HLNUG_discharge(areas, mappings):
     """
     Reads the single discharge data of the HLNUG (https://www.hlnug.de/start.html)
     and returns it as a dataframe, where all values have the unit of mm (l/m²)
@@ -46,22 +62,31 @@ def read_HLNUG_discharge():
         if file[-3:] != "zrx":
             continue
         # Read in the river
-        river = pd.read_csv(file, index_col=0, skiprows=6, sep=" ", header=None)
+        river = pd.read_csv(file, index_col=0, skiprows=6, sep=" ", header=None,
+                            na_values=-777)
         # Fix names and dates
         river.index = pd.to_datetime(river.index.map(str), format="%Y%m%d%H%M%S")
-        river.columns = [file.split("_")[0]]
+        river_id = file.split("_")[0]
+        river.columns = [river_id]
         river.index.names = ["Date"]
+        # change unit
+        print(river_id)
+        gauge_name = mappings[river_id]
+        river = m3_to_mm(river, areas[gauge_name])
         all_rivers.append(river)
     # Combine the dataframes
     discharge = reduce(lambda x, y: pd.merge(x, y, right_index=True, left_index=True), all_rivers)
-#        print(type(river.index[0]))
-#        river.index = pd.to_datetime(river.index, format=)
-#        print(river)
-#        print(file)
     return discharge
     
     
+def m3_to_mm(series, area):
+    """
+    Converts a series of m3 to mm
+    """
+    series = series * 86400 * 1000 / area
+    return series   
 
 
 mappings = read_mapping()
-discharge = read_HLNUG_discharge()
+areas = read_areas()
+discharge = read_HLNUG_discharge(areas, mappings)
