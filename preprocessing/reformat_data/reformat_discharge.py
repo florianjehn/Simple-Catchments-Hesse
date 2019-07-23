@@ -92,6 +92,7 @@ def save_df(df, name):
     """
     # Go the the cleaned data folder
     os.chdir(os.path.abspath(os.path.join(file_dir, os.pardir+os.sep))+os.sep+"cleaned_data")
+    # Save
     df.to_csv(name, sep=";")
         
     
@@ -100,5 +101,5 @@ def save_df(df, name):
 
 mappings = read_mapping()
 areas = read_areas()
-discharge = read_HLNUG_discharge(areas, mappings)
-save_df(discharge, "discharge_mm_1990_2018.csv")
+#discharge = read_HLNUG_discharge(areas, mappings)
+#save_df(discharge, "discharge_mm_1990_2018.csv")
