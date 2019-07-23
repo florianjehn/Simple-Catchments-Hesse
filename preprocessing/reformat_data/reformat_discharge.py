@@ -70,7 +70,6 @@ def read_HLNUG_discharge(areas, mappings):
         river.columns = [river_id]
         river.index.names = ["Date"]
         # change unit
-        print(river_id)
         gauge_name = mappings[river_id]
         river = m3_to_mm(river, areas[gauge_name])
         all_rivers.append(river)
@@ -87,6 +86,19 @@ def m3_to_mm(series, area):
     return series   
 
 
+def save_df(df, name):
+    """
+    saves a df in the cleaned data folder
+    """
+    # Go the the cleaned data folder
+    os.chdir(os.path.abspath(os.path.join(file_dir, os.pardir+os.sep))+os.sep+"cleaned_data")
+    df.to_csv(name, sep=";")
+        
+    
+
+    
+
 mappings = read_mapping()
 areas = read_areas()
 discharge = read_HLNUG_discharge(areas, mappings)
+save_df(discharge, "discharge_mm_1990_2018.csv")
