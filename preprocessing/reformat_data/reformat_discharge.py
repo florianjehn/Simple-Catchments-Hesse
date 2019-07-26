@@ -2,7 +2,7 @@
 """
 Created on Thu Jul 18 12:49:49 2019
 
-@author: gh2668
+@author: Florian Ulrich Jehn
 """
 import pandas as pd
 from functools import reduce
