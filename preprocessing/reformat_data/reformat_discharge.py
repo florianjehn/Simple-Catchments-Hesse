@@ -105,4 +105,4 @@ mappings = read_mapping()
 areas = read_areas()
 discharge = read_HLNUG_discharge(areas, mappings)
 discharge = discharge.loc[start_date:,:]
-save_df(discharge, "discharge_mm_1991_2018.csv")
+save_df(discharge, "dis_mm_1991_2018.csv")

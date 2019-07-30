@@ -25,6 +25,6 @@ def calculate_delta_s(dis, prec, et):
 
 et = read_df("et_mm_1991_2018.csv")
 prec = read_df("prec_mm_1991_2018.csv")
-dis = read_df("discharge_mm_1991_2018.csv")
+dis = read_df("dis_mm_1991_2018.csv")
 dS = calculate_delta_s(dis, prec, et)
 dS.to_csv("dS_mm_1991_2018.csv", sep=";")
