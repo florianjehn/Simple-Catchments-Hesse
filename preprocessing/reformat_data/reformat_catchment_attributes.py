@@ -17,7 +17,7 @@ def read_attributes():
     return att_df
 
 
-def classify_numerical(df, bins, skip_cols, labels):
+def classify_numerical(df, bins, skip_cols, labels=None):
     """
     Classifies all numerical columns of a dataframe to a defined number of 
     classes and returns the new df
@@ -26,7 +26,11 @@ def classify_numerical(df, bins, skip_cols, labels):
         # Skyp all non numericals
         if not np.issubdtype(df[col], np.number) or col in skip_cols:
             continue
-        df[col+"_cat"] = pd.cut(df[col], bins=bins, labels=labels)
+        if labels is None:
+            df[col+"_cat"] = pd.cut(df[col], bins=bins)
+        else:
+            df[col+"_cat"] = pd.cut(df[col], bins=bins, labels=labels)
+
     return df
 
 
@@ -52,8 +56,7 @@ def calculate_additional_measures(att_df):
 att_df = read_attributes()
 att_df = calculate_additional_measures(att_df)
 
-att_df = classify_numerical(att_df, 3, ["gauge_id", "breite", "laenge", "ratio", "max_flow_len", "perimeter"],
-                                       ["lowest_third", "middle_third", "highest_third"])
+att_df = classify_numerical(att_df, 3, ["gauge_id", "breite", "laenge", "ratio", "max_flow_len", "perimeter"])
 cleaned = ['gauge', 'gauge_id', 'leitercharackter_huek250', 'hohlraumart_huek250',
        'durchlässigkeit_huek250', 'dominating_soil_type_bk500',
        'gesteinsart_huek250', 'soil_texture_boart_1000', 'land_use_corine',

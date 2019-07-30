@@ -68,7 +68,7 @@ def read_HLNUG_discharge(areas, mappings):
         river.index = pd.to_datetime(river.index.map(str), format="%Y%m%d%H%M%S")
         river_id = file.split("_")[0]
         river.columns = [river_id]
-        river.index.names = ["Date"]
+        river.index.names = ["date"]
         # change unit
         gauge_name = mappings[river_id]
         river = m3_to_mm(river, areas[gauge_name])
@@ -101,5 +101,5 @@ def save_df(df, name):
 
 mappings = read_mapping()
 areas = read_areas()
-#discharge = read_HLNUG_discharge(areas, mappings)
-#save_df(discharge, "discharge_mm_1990_2018.csv")
+discharge = read_HLNUG_discharge(areas, mappings)
+save_df(discharge, "discharge_mm_1990_2018.csv")
