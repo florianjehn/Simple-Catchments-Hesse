@@ -12,7 +12,23 @@ import os
 file_dir = os.path.dirname(os.path.abspath(__file__))
 
 
-def read_averaged_data(data_type, data_name):
+def read_mapping():
+    """
+    Reads the mapping of the rivers to their id and returns it as a dict
+    """
+    # Make sure we are in the right directoy
+    os.chdir(file_dir)
+    mappings = {}
+    with open("map_name_nr_pegel.csv", "r") as mapping:
+        # Skip the header
+        mapping.readline()
+        for line in mapping.readlines():
+            name, id_river = line.replace("\n","").split(";")
+            mappings[id_river] = name
+    return mappings     
+
+
+def read_averaged_data(data_type, data_name, mapping):
     """
     Reads in the averaged data from regnie and so on
     """
@@ -28,21 +44,30 @@ def read_averaged_data(data_type, data_name):
         name = file.split(".")[0] 
         temp_df = pd.read_csv(file, index_col=0)
         temp_df.index = pd.to_datetime(temp_df.index)
-        temp_df.columns = [name]
+        # Handle the annoying German spelling
+        split = name.split("_")            
+        name = split[1] if len(split)==2 else " ".join(split[1:])
+        if name.split(" ")[0] in ["Ober", "Nieder", "Unter", "Jossa"]:
+            name = "-".join(name.split(" "))
+        if name.split(" ")[0] == "Gross":
+            split = name.split(" ")
+            name = split[0] + "-" + split[1] + " " + split[2]
+        print(name)
+        temp_df.columns = [mapping[name]]
         all_data = pd.concat([all_data, temp_df], axis=1)
     return all_data  
 
-def read_et():
+def read_et(start_date, end_date, mapping):
     """
     Reads all actual et data for all catchments
     """
-    return read_averaged_data("evapo_r", "ET")  
+    return read_averaged_data("evapo_r", "ET",mapping).loc[start_date:end_date,:]
 
-def read_prec():
+def read_prec(start_date, end_date, mapping):
     """
     Reads in the precipitation for all catchments
     """
-    return read_averaged_data("regnie", "Prec")   
+    return read_averaged_data("regnie", "Prec", mapping).loc[start_date:end_date,:]
 
 def save_df(df, name):
     """
@@ -56,9 +81,10 @@ def save_df(df, name):
 
 if __name__ == "__main__":
     # Save the cwd, so we can access it later to get back to the right path easier
-    start_date = datetime.date(1991, 1, 7)
+    start_date = datetime.date(1991, 1, 1)
     end_date = datetime.date(2018, 12, 31)
-    et_df = read_et()
+    mapping = {v: k for k, v in read_mapping().items()}
+    et_df = read_et(start_date, end_date,mapping)
     save_df(et_df, "et_mm_1991_2018.csv")
-    prec_df = read_prec()
+    prec_df = read_prec(start_date, end_date, mapping)
     save_df(prec_df, "prec_mm_1991_2018.csv")

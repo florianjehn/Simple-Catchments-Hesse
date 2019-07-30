@@ -7,6 +7,7 @@ Created on Thu Jul 18 12:49:49 2019
 import pandas as pd
 from functools import reduce
 import os
+import datetime
 # Get the location of this file
 file_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -98,8 +99,10 @@ def save_df(df, name):
     
 
     
-
+start_date = datetime.date(1991, 1, 1)
+end_date = datetime.date(2018, 12, 31)
 mappings = read_mapping()
 areas = read_areas()
 discharge = read_HLNUG_discharge(areas, mappings)
-save_df(discharge, "discharge_mm_1990_2018.csv")
+discharge = discharge.loc[start_date:,:]
+save_df(discharge, "discharge_mm_1991_2018.csv")
