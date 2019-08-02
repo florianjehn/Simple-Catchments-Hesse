@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-home = os.path.dirname(__file__) + '/cleaned_data'
+home = os.path.dirname(__file__) 
 
 def get_table_dict():
     """
@@ -25,4 +25,4 @@ def get_table_dict():
 
 def get_attributes():
 
-    return pd.read_csv(home + '/cleaned_attributes.csv', delimiter=';')
+    return pd.read_csv(home + '/cleaned_attributes.csv', delimiter=';', index_col=0)
