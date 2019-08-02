@@ -21,7 +21,6 @@ def ETcorrection(df: pd.DataFrame):
     :param df: A dataframe of Catchment timeseries data
     :return: Correction factor for all catchments
     """
-    print(df)
     totE = df.E.sum()  # total ET in mm over whole period
 
     balance = (df.P - df.E - df.Q).sum()  # water balance over whole period
@@ -73,7 +72,7 @@ def plot_storage(dataframes: dict, attribs: pd.DataFrame):
     for catch in dataframes.keys():
         df = dataframes[catch]
         fET = ETcorrection(df)
-        print(catch, attribs.loc[catch].gauge, fET)
+        #print(catch, attribs.loc[catch].gauge, fET)
         plt.plot(np.cumsum(df.P - df.E * fET - df.Q), label=attribs.loc[catch].gauge,
                  color="grey", linewidth=0.5)
         plt.ylabel('S(t) [mm]')
