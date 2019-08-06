@@ -90,3 +90,4 @@ if __name__ == '__main__':
    # plot_Q_vs_cumdS(dataframes)
     type_of_catchment = define_catchment_type(dataframes)
 
+#DF = DF[DF.columns].astype(float)  # or int
