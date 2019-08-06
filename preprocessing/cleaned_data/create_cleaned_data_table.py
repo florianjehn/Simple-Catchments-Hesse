@@ -29,7 +29,7 @@ def get_table_dict(calc_water_year=False):
 def water_year(df:pd.DataFrame):
     """
     Adds a column to a dataframe (with datetime index) with the hydrological year 
-    and one with the day of the water year
+    , hydrological day and hydrological month
     """
     df["water_year"] = (df.index + pd.DateOffset(months=2)).year
     days_water_year = []
@@ -40,6 +40,14 @@ def water_year(df:pd.DataFrame):
         else:
             days_water_year += list(range(1, year_df.shape[0]+1))
     df["day_of_water_year"] = days_water_year
+    def shift_month(month):
+        if month == 11:
+            return 1
+        elif month == 12:
+            return 2
+        else:
+            return month + 2
+    df["month_of_water_year"] = list(map(shift_month, list(df.index.month)))
 
 
 def get_attributes():
