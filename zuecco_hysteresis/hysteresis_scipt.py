@@ -26,11 +26,9 @@ def indice_Qnorm(Qselected, Qnorm:pd.Series):
     # Calculate the rising limb of the hydrograph
     delta_rise = pd.Series(np.nan, index=Qnorm.index)
     for i in Qnorm.loc[:maxQnorm].index:
-        # First part to find the closest values to Qselected
-        delta_rise.loc[i] = abs(Qnorm.loc[i] - Qselected) 
-    
+        delta_rise.loc[i] = Qnorm.loc[i] - Qselected
     # Lower than "0" = Qrise_minor
-    if (delta_rise > 0).all():
+    if (delta_rise.dropna() > 0).all():
         Qrise_major = Qrise_minor = Qfall_major = Qfall_minor = np.nan
         return Qrise_major, Qrise_minor, Qfall_major, Qfall_minor
 
@@ -71,7 +69,7 @@ def indice_Qnorm(Qselected, Qnorm:pd.Series):
         return Qrise_major, Qrise_minor, Qfall_major, Qfall_minor
     
     # Lower than "0" = Qfall_minor
-    if (delta_fall > 0).all():
+    if (delta_fall.dropna() > 0).all():
         Qrise_major = Qrise_minor = Qfall_major = Qfall_minor = np.nan
         return Qrise_major, Qrise_minor, Qfall_major, Qfall_minor
     
@@ -93,3 +91,4 @@ if __name__ == "__main__":
     Q_fixed = list(np.arange(0.15, 1.05, 0.05))
     Qnorm = normalize(Q)
     ynorm = normalize(y)
+    Qrise_major, Qrise_minor, Qfall_major, Qfall_minor = indice_Qnorm(0.75, Qnorm)
