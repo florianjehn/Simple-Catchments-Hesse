@@ -30,7 +30,6 @@ def indice_Qnorm(Qselected, Qnorm:pd.Series):
         delta_rise.loc[i] = abs(Qnorm.loc[i] - Qselected) 
     
     # Lower than "0" = Qrise_minor
-    negative = (delta_rise < 0).values
     if (delta_rise > 0).all():
         Qrise_major = Qrise_minor = Qfall_major = Qfall_minor = np.nan
         return Qrise_major, Qrise_minor, Qfall_major, Qfall_minor
@@ -46,7 +45,6 @@ def indice_Qnorm(Qselected, Qnorm:pd.Series):
     if delta_rise.iloc[Qrise_minor+1] > delta_rise.iloc[Qrise_minor]:
         Qrise_major = Qrise_minor+1
     else:
-        positive = (delta_rise > 0).values
         # Find closest value to Qselected in the upper part of the vector
         value_positive = delta_rise[delta_rise>0].min()
         # Select the closest value in time to the lower part of the vector
@@ -58,12 +56,33 @@ def indice_Qnorm(Qselected, Qnorm:pd.Series):
     # Falling limb of the hydrograph
     delta_fall = pd.Series(np.nan, index=Qnorm.index)
     for j in Qnorm.loc[maxQnorm:].index:
-        delta_fall(j) = Qnorm[j] - Qselected
+        delta_fall[j] = Qnorm[j] - Qselected
         
-        
-        
+    # Hihger than "0" = Qfall_major
+    # Find the positive value closest to 0
+    value_positive = delta_fall[delta_fall>0].min()
+    # Find the index of value_positive (last occurence)
+    index_value = delta_fall.where(delta_fall==value_positive).last_valid_index()
+    index_position = delta_fall.index.get_loc(index_value)
+    Qfall_major = index_position
     
+    if Qfall_major == len(Qnorm):
+        Qrise_major = Qrise_minor = Qfall_major = Qfall_minor = np.nan
+        return Qrise_major, Qrise_minor, Qfall_major, Qfall_minor
     
+    # Lower than "0" = Qfall_minor
+    if (delta_fall > 0).all():
+        Qrise_major = Qrise_minor = Qfall_major = Qfall_minor = np.nan
+        return Qrise_major, Qrise_minor, Qfall_major, Qfall_minor
+    
+    if delta_fall.iloc[Qfall_major+1] < delta_fall.iloc[Qfall_major]:
+        Qfall_minor = Qfall_major + 1
+    else:
+        # Find the negative value closest to 0
+        value_negative = delta_fall[delta_fall<0].max()
+        index_value = delta_fall.where(delta_fall==value_negative).last_valid_index()
+        index_position = delta_fall.index.get_loc(index_value)        
+        Qfall_minor = index_position   
     
     return Qrise_major, Qrise_minor, Qfall_major, Qfall_minor
 
