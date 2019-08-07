@@ -26,15 +26,42 @@ def indice_Qnorm(Qselected, Qnorm:pd.Series):
     # Calculate the rising limb of the hydrograph
     delta_rise = pd.Series(np.nan, index=Qnorm.index)
     for i in Qnorm.loc[:maxQnorm].index:
-        delta_rise.loc[i] = abs(Qnorm.loc[i] - Qselected) # First part to find the closest values to Qselected
+        # First part to find the closest values to Qselected
+        delta_rise.loc[i] = abs(Qnorm.loc[i] - Qselected) 
     
     # Lower than "0" = Qrise_minor
-    negative = delta_rise[delta_rise<0]
-    if len(negative) > 0:
+    negative = (delta_rise < 0).values
+    if (delta_rise > 0).all():
         Qrise_major = Qrise_minor = Qfall_major = Qfall_minor = np.nan
         return Qrise_major, Qrise_minor, Qfall_major, Qfall_minor
 
-    # 
+    # Find the negative value closest to 0
+    value_negative = delta_rise[delta_rise<0].max()
+    # Find the index of value_negative (latest occurence)
+    index_value = delta_rise.where(delta_rise==value_negative).last_valid_index()
+    index_position = delta_rise.index.get_loc(index_value)
+    Qrise_minor = index_position
+    
+    # Higher than "0" = Qrise major
+    if delta_rise.iloc[Qrise_minor+1] > delta_rise.iloc[Qrise_minor]:
+        Qrise_major = Qrise_minor+1
+    else:
+        positive = (delta_rise > 0).values
+        # Find closest value to Qselected in the upper part of the vector
+        value_positive = delta_rise[delta_rise>0].min()
+        # Select the closest value in time to the lower part of the vector
+        # Find the index of value_negative (first occurence)
+        index_value = delta_rise.where(delta_rise==value_positive).first_valid_index()
+        index_position = delta_rise.index.get_loc(index_value)
+        Qrise_major = index_position
+        
+    # Falling limb of the hydrograph
+    delta_fall = pd.Series(np.nan, index=Qnorm.index)
+    for j in Qnorm.loc[maxQnorm:].index:
+        delta_fall(j) = Qnorm[j] - Qselected
+        
+        
+        
     
     
     
