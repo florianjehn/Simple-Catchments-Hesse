@@ -7,7 +7,6 @@ Script for the computation of the hysteresis index by G. Zuecco (2016)
 """
 import pandas as pd
 import numpy as np
-from scipy.stats import linregress
 
 
 def hysteresis_class(x:pd.Series,y:pd.Series,x_fixed:pd.Series):
@@ -31,7 +30,7 @@ def hysteresis_class(x:pd.Series,y:pd.Series,x_fixed:pd.Series):
     rise_area,fall_area,diff_area,h = force_linearity(rise_area,
                                                       fall_area, diff_area,h, 
                                                       x_fixed)
-    return find_hysteresis_class(x, y, min_dA, max_dA, h)
+    return diff_area, h , find_hysteresis_class(x, y, min_dA, max_dA, h)
 
 
 def normalize(series:pd.Series):
@@ -313,14 +312,45 @@ def find_hysteresis_class(x:pd.Series, y:pd.Series, min_dA:float,
 
 
 if __name__ == "__main__":
-    test_df = pd.read_excel("hysteresis_examples.xlsx", index_col=0)
-    x = test_df["Q"]
-    y = test_df["soil_moisture"]
-    x_fixed = pd.Series([0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 
-                         0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95, 1.00])
-    hysteresis_class = hysteresis_class(x, y, x_fixed)
-    if hysteresis_class == 4:
-        print("Delivers same class for test data as matlab code")
-    else:
-        print("Delivers wrong hysteresis class")
+    import matplotlib.pyplot as plt
+    fig, axes = plt.subplots(nrows=4, ncols=2)
+    mapping = {0:"soil_1", 1:"soil_2", 2:"connectivity_1", 3:"connectivity_2"}
+    right_hyst_class = {"soil_1":4, "soil_2":1, "connectivity_1":0,
+                        "connectivity_2":2}
+    for sheet in range(4):
+        print(mapping[sheet])
+        test_df = pd.read_excel("hysteresis_examples.xlsx",
+                                                   sheet_name=sheet, 
+                                                   index_col=0)
+        x = test_df[test_df.columns[0]]
+        y = test_df[test_df.columns[1]]
+        x_fixed = pd.Series([0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 
+                             0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 
+                             0.95, 1.00])
+        diff_area, h, hyst_class = hysteresis_class(x, y, x_fixed)
+        if hyst_class == right_hyst_class[mapping[sheet]]:
+            print("Delivers same class for test data as matlab code")
+        else:
+            print("Delivers wrong hysteresis class")
+        
+        # make the same plots as the matlab code
+        ax1 = axes[sheet, 0]
+        ax2 = axes[sheet, 1]
+        
+        ax1.plot(x,y)
+        ax1.set_xlabel("Streamflow")
+        ax1.set_ylabel("Soil moisture")
+        ax1.set_title('Hysteretic plot (input data)')
+        
+        x2 = [0, 0.5, 1]
+        y2 = [0, 0, 0]
+        
+        ax2.plot(x_fixed[:-1], diff_area, color="red")
+        ax2.set_xlabel('Streamflow (-)')
+        ax2.set_ylabel('\DeltaA (-)')
+        ax2.set_title('Difference between the integrals')
+    
+    fig.tight_layout()
+    
+    
 
