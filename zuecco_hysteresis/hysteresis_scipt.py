@@ -328,6 +328,7 @@ if __name__ == "__main__":
                              0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 
                              0.95, 1.00])
         diff_area, h, hyst_class = hysteresis_class(x, y, x_fixed)
+        diff_area = abs(diff_area)
         if hyst_class == right_hyst_class[mapping[sheet]]:
             print("Delivers same class for test data as matlab code")
         else:
