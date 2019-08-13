@@ -10,7 +10,7 @@ import numpy as np
 from scipy.stats import linregress
 
 
-def find_hysteresis_class(x:pd.Series,y:pd.Series,x_fixed:pd.Series):
+def hysteresis_class(x:pd.Series,y:pd.Series,x_fixed:pd.Series):
     """
     Finds hysteresis class for x and y
     """
@@ -25,9 +25,13 @@ def find_hysteresis_class(x:pd.Series,y:pd.Series,x_fixed:pd.Series):
     rise_area,fall_area,diff_area,h = area_hysteresis_index(x_fixed, 
                                                             y_fixed_rise, 
                                                             y_fixed_fall)
-
-    hysteresis_class = None
-    return hysteresis_class
+    # Save the the min and max before forcing the linearity
+    min_dA=min(diff_area)
+    max_dA=max(diff_area)
+    rise_area,fall_area,diff_area,h = force_linearity(rise_area,
+                                                      fall_area, diff_area,h, 
+                                                      x_fixed)
+    return find_hysteresis_class(x, y, min_dA, max_dA, h)
 
 
 def normalize(series:pd.Series):
@@ -70,11 +74,11 @@ def indice_x_norm(x_selected:float, x_norm:pd.Series):
     """
     
     # Find the index of the peak
-    index_max_x_norm = x_norm.index.get_loc(x_norm.idxmax())
+    pos_max_x_norm = x_norm.index.get_loc(x_norm.idxmax())
     
     # Calculate the rising limb 
     delta_rise = pd.Series(np.nan, index=x_norm.index)
-    for i in range(index_max_x_norm + 1): # plus one as matlab counts different
+    for i in range(pos_max_x_norm + 1): # plus one as matlab counts different
         delta_rise.iloc[i] = x_norm.iloc[i] - x_selected
     # Lower than "0" = x_rise_minor
     if (delta_rise.dropna() > 0).all():
@@ -103,7 +107,7 @@ def indice_x_norm(x_selected:float, x_norm:pd.Series):
         
     # Falling limb of the hydrograph
     delta_fall = pd.Series(np.nan, index=x_norm.index)
-    for j in range(index_max_x_norm, len(x_norm)):
+    for j in range(pos_max_x_norm, len(x_norm)):
         delta_fall[j] = x_norm[j] - x_selected
         
     # Hihger than "0" = x_fall_major
@@ -202,7 +206,6 @@ def area_hysteresis_index(x_fixed:pd.Series, y_fixed_rise:pd.Series,
     
     for j in range(len(step)):
         step.iloc[j] = x_fixed[j+1] - x_fixed[j]
-        print(step)
         areas_rising.iloc[j] = (y_fixed_rise[j+1] + y_fixed_rise[j]) * step[j] / 2
         areas_falling.iloc[j] = (y_fixed_fall[j+1] + y_fixed_fall[j]) * step[j] / 2
         diff_area.iloc[j] = areas_rising[j] - areas_falling[j]
@@ -211,6 +214,102 @@ def area_hysteresis_index(x_fixed:pd.Series, y_fixed_rise:pd.Series,
     return areas_rising, areas_falling, diff_area,h
 
 
+def force_linearity(rise_area:pd.Series, fall_area:pd.Series, 
+                    diff_area:pd.Series, h: float, x_fixed:pd.Series):
+    """not sure what this function is supposed to be doing"""
+    # Forcing linearity (no loop) = 0
+    for to_fix in [rise_area, fall_area, diff_area]:
+        for k in range(len(x_fixed)-1):
+            if np.isnan(to_fix[k]):
+                to_fix[k] = 0
+    if np.isnan(h):
+        h=0
+    return rise_area, fall_area, diff_area, h
+
+
+def find_hysteresis_class(x:pd.Series, y:pd.Series, min_dA:float, 
+                          max_dA:float, h:float):
+    """
+    Finds the hysteresis class based on the values calculated beforehand
+    """
+    pos_max_x = x.index.get_loc(x.idxmax())
+    min_y_rise = min(y.iloc[:pos_max_x + 1])
+    max_y_rise = max(y.iloc[:pos_max_x + 1])
+    change_max_y_rise = abs(max_y_rise - y[0])
+    change_min_y_rise = abs(min_y_rise - y[0])
+    
+    if change_max_y_rise > change_min_y_rise:
+        if min_dA > 0 and max_dA > 0:
+            hyst_class = 1
+        else:
+            if min_dA < 0 and max_dA < 0:
+                hyst_class = 4
+            else:
+                if min_dA <= 0 and max_dA > 0 and h >= 0:
+                    hyst_class = 2
+                else:
+                    if min_dA < 0 and max_dA >= 0 and h<0:
+                        hyst_class = 3
+                    else:
+                        hyst_class = 0 # linearity
+                
+    if change_max_y_rise < change_min_y_rise:
+        if min_dA > 0 and max_dA > 0:
+            hyst_class = 5
+        else:
+            if min_dA < 0 and max_dA < 0:
+                hyst_class = 8
+            else:
+                if min_dA <= 0 and max_dA > 0 and h >= 0:
+                    hyst_class = 6
+                else:
+                    if min_dA < 0 and max_dA >= 0 and h < 0:
+                        hyst_class= 7 
+                    else:
+                        hyst_class = 0 # linearity
+    
+    
+    if change_max_y_rise == change_min_y_rise:
+        pos_max_x = x.index.get_loc(x.idxmax())
+        min_y_fall = min(y.iloc[pos_max_x:])
+        max_y_fall = max(y.iloc[pos_max_x:])
+        change_max_y_fall = abs(max_y_fall - y[0])
+        change_min_y_fall = abs(min_y_fall - y[0])
+
+        if change_max_y_fall > change_min_y_fall:
+            if min_dA > 0 and max_dA > 0:
+                hyst_class = 1
+            else:
+                if min_dA < 0 and max_dA < 0:
+                    hyst_class = 4
+                else:
+                    if min_dA <= 0 and max_dA > 0 and h >= 0:
+                        hyst_class = 2
+                    else:
+                        if min_dA < 0 and max_dA >= 0 and h < 0:
+                            hyst_class = 3
+                        else:
+                            hyst_class = 0 # linearity
+        else:
+            if change_max_y_fall < change_min_y_fall:
+                if min_dA > 0 and max_dA > 0:
+                    hyst_class = 5
+                else:
+                    if min_dA < 0 and max_dA < 0:
+                        hyst_class = 8
+                    else:
+                        if min_dA <= 0 and max_dA > 0 and h >= 0:
+                            hyst_class = 6
+                        else:
+                            if min_dA < 0 and max_dA >= 0 and h < 0:
+                                hyst_class = 7
+                            else:
+                                hyst_class = 0 # linearity
+
+        if change_max_y_fall == change_min_y_fall:
+            hyst_class = 0
+
+    return hyst_class
 
 
 if __name__ == "__main__":
@@ -219,5 +318,9 @@ if __name__ == "__main__":
     y = test_df["soil_moisture"]
     x_fixed = pd.Series([0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 
                          0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95, 1.00])
-    hysteresis_class = find_hysteresis_class(x, y, x_fixed)
+    hysteresis_class = hysteresis_class(x, y, x_fixed)
+    if hysteresis_class == 4:
+        print("Delivers same class for test data as matlab code")
+    else:
+        print("Delivers wrong hysteresis class")
 
