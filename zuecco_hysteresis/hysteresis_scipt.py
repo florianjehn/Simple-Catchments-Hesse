@@ -22,7 +22,10 @@ def find_hysteresis_class(x:pd.Series,y:pd.Series,x_fixed:pd.Series):
     y_fixed_rise, y_fixed_fall = y_for_x_fixed(x_rise_h, x_rise_l, 
                                                x_fall_h, x_fall_l, y_norm, 
                                                x_norm, x_fixed)
-    print(y_fixed_rise)
+    rise_area,fall_area,diff_area,h = area_hysteresis_index(x_fixed, 
+                                                            y_fixed_rise, 
+                                                            y_fixed_fall)
+
     hysteresis_class = None
     return hysteresis_class
 
@@ -33,8 +36,8 @@ def normalize(series:pd.Series):
 
 def find_independent_indices(x_fixed: pd.Series, x_norm:pd.Series):
     """
-    The function indice_x_norm is applied to find indices for x for observations
-    for all values of x_fixed. 
+    The function indice_x_norm is applied to find indices for x for 
+    observations for all values of x_fixed. 
     """
     x_rise_h = pd.Series(0, index=range(len(x_fixed)))
     x_rise_l = pd.Series(0, index=range(len(x_fixed)))
@@ -71,7 +74,7 @@ def indice_x_norm(x_selected:float, x_norm:pd.Series):
     
     # Calculate the rising limb 
     delta_rise = pd.Series(np.nan, index=x_norm.index)
-    for i in range(index_max_x_norm + 1): # plus one as matlab counts differently
+    for i in range(index_max_x_norm + 1): # plus one as matlab counts different
         delta_rise.iloc[i] = x_norm.iloc[i] - x_selected
     # Lower than "0" = x_rise_minor
     if (delta_rise.dropna() > 0).all():
@@ -81,7 +84,8 @@ def indice_x_norm(x_selected:float, x_norm:pd.Series):
     # Find the negative value closest to 0
     value_negative = delta_rise[delta_rise<0].max()
     # Find the index of value_negative (latest occurence)
-    index_value = delta_rise.where(delta_rise==value_negative).last_valid_index()
+    index_value = delta_rise.where(
+            delta_rise==value_negative).last_valid_index()
     index_position = delta_rise.index.get_loc(index_value)
     x_rise_minor = index_position
     # Higher than "0" = xrise major
@@ -106,7 +110,8 @@ def indice_x_norm(x_selected:float, x_norm:pd.Series):
     # Find the positive value closest to 0
     value_positive = delta_fall[delta_fall>=0].min()
     # Find the index of value_positive (last occurence)
-    index_value = delta_fall.where(delta_fall==value_positive).last_valid_index()
+    index_value = delta_fall.where(
+            delta_fall==value_positive).last_valid_index()
     index_position = delta_fall.index.get_loc(index_value)
     x_fall_major = index_position
     
@@ -151,11 +156,17 @@ def y_for_x_fixed(x_rise_h:pd.Series, x_rise_l:pd.Series, x_fall_h:pd.Series,
     to x_fixed
     """
     # Calculate the slope for rising and falling limb
-    m_rise=(y_norm[x_rise_h].values - y_norm[x_rise_l].values) / (x_norm[x_rise_h].values - x_norm[x_rise_l].values) 
-    m_fall=(y_norm[x_fall_l].values - y_norm[x_fall_h].values) / (x_norm[x_fall_l].values - x_norm[x_fall_h].values) 
+    m_rise=((y_norm[x_rise_h].values - y_norm[x_rise_l].values) / 
+            (x_norm[x_rise_h].values - x_norm[x_rise_l].values)) 
+    m_fall=((y_norm[x_fall_l].values - y_norm[x_fall_h].values) / 
+            (x_norm[x_fall_l].values - x_norm[x_fall_h].values)) 
     # Calculate intercept for rising and falling limb
-    q_rise=((x_norm[x_rise_h].values * y_norm[x_rise_l].values) - (x_norm[x_rise_l].values * y_norm[x_rise_h].values)) / (x_norm[x_rise_h].values - x_norm[x_rise_l].values) 
-    q_fall=((x_norm[x_fall_l].values * y_norm[x_fall_h].values) - (x_norm[x_fall_h].values * y_norm[x_fall_l].values)) / (x_norm[x_fall_l].values - x_norm[x_fall_h].values) 
+    q_rise=(((x_norm[x_rise_h].values * y_norm[x_rise_l].values) - 
+             (x_norm[x_rise_l].values * y_norm[x_rise_h].values)) / 
+             (x_norm[x_rise_h].values - x_norm[x_rise_l].values)) 
+    q_fall=(((x_norm[x_fall_l].values * y_norm[x_fall_h].values) - 
+             (x_norm[x_fall_h].values * y_norm[x_fall_l].values)) / 
+             (x_norm[x_fall_l].values - x_norm[x_fall_h].values)) 
     
     y_fixed_rise = pd.Series(0, index=x_fixed.index)
     y_fixed_fall = pd.Series(0, index=x_fixed.index)
@@ -176,7 +187,8 @@ def y_for_x_fixed(x_rise_h:pd.Series, x_rise_l:pd.Series, x_fall_h:pd.Series,
 
 
 
-def area_hysteresis_index(x_fixed:pd.Series, y_rising:pd.Series, y_falling:pd.Series):
+def area_hysteresis_index(x_fixed:pd.Series, y_fixed_rise:pd.Series, 
+                          y_fixed_fall:pd.Series):
     """
     Computation of the difference between integrals on the rising and the
     falling curve. The areas of trapezoid are computed because the functions
@@ -188,14 +200,15 @@ def area_hysteresis_index(x_fixed:pd.Series, y_rising:pd.Series, y_falling:pd.Se
     areas_falling = pd.Series(0, index=range(du))
     diff_area = pd.Series(0, index=range(du))
     
-    for j in len(step):
-        step[j] = x_fixed[j+1] - x_fixed[j]
-        areas_rising[j] = (y_rising[j+1] + y_rising[j]) * step[j] / 2
-        areas_falling[j] = (y_falling[j+1] + y_falling[j]) * step[j] / 2
-        diff_area[j] = areas_rising[j] - areas_falling[j]
+    for j in range(len(step)):
+        step.iloc[j] = x_fixed[j+1] - x_fixed[j]
+        print(step)
+        areas_rising.iloc[j] = (y_fixed_rise[j+1] + y_fixed_rise[j]) * step[j] / 2
+        areas_falling.iloc[j] = (y_fixed_fall[j+1] + y_fixed_fall[j]) * step[j] / 2
+        diff_area.iloc[j] = areas_rising[j] - areas_falling[j]
     h = diff_area.sum()
 
-    return areas_rising,areas_falling,diff_area,h
+    return areas_rising, areas_falling, diff_area,h
 
 
 
@@ -204,7 +217,7 @@ if __name__ == "__main__":
     test_df = pd.read_excel("hysteresis_examples.xlsx", index_col=0)
     x = test_df["Q"]
     y = test_df["soil_moisture"]
-    x_fixed = pd.Series([0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60,
-               0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95, 1.00])
+    x_fixed = pd.Series([0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 
+                         0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95, 1.00])
     hysteresis_class = find_hysteresis_class(x, y, x_fixed)
 
