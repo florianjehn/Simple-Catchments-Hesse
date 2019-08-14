@@ -30,11 +30,12 @@ def hysteresis_class(x:pd.Series,y:pd.Series,x_fixed:pd.Series):
     rise_area,fall_area,diff_area,h = force_linearity(rise_area,
                                                       fall_area, diff_area,h, 
                                                       x_fixed)
+    
     return diff_area, h , find_hysteresis_class(x, y, min_dA, max_dA, h)
 
 
 def normalize(series:pd.Series):
-    return ((series-series.min()) / (series.max() - series.min()))
+    return ((series - series.min()) / (series.max() - series.min()))
 
 
 def find_independent_indices(x_fixed: pd.Series, x_norm:pd.Series):
@@ -55,7 +56,6 @@ def find_independent_indices(x_fixed: pd.Series, x_norm:pd.Series):
             x_rise_h[k], x_rise_l[k], x_fall_h[k], x_fall_l[k] = (
                     indice_x_norm(x_fixed[k],x_norm))
         else:
-            # Why save the same thing two times? Unclear in original script
             x_rise_h[k] = x_rise_l[k] = indices[0]
             x_fall_h[k] = x_fall_l[k] = indices[-1]           
             
@@ -82,6 +82,7 @@ def indice_x_norm(x_selected:float, x_norm:pd.Series):
     # Lower than "0" = x_rise_minor
     if (delta_rise.dropna() > 0).all():
         x_rise_major = x_rise_minor = x_fall_major = x_fall_minor = np.nan
+        
         return x_rise_major, x_rise_minor, x_fall_major, x_fall_minor
     
     # Find the negative value closest to 0
@@ -136,6 +137,7 @@ def indice_x_norm(x_selected:float, x_norm:pd.Series):
                 delta_fall==value_negative).last_valid_index()
         index_position = delta_fall.index.get_loc(index_value)        
         x_fall_minor = index_position   
+        
     return x_rise_major, x_rise_minor, x_fall_major, x_fall_minor
         
 
@@ -159,17 +161,23 @@ def y_for_x_fixed(x_rise_h:pd.Series, x_rise_l:pd.Series, x_fall_h:pd.Series,
     to x_fixed
     """
     # Calculate the slope for rising and falling limb
-    m_rise=((y_norm[x_rise_h].values - y_norm[x_rise_l].values) / 
-            (x_norm[x_rise_h].values - x_norm[x_rise_l].values)) 
-    m_fall=((y_norm[x_fall_l].values - y_norm[x_fall_h].values) / 
-            (x_norm[x_fall_l].values - x_norm[x_fall_h].values)) 
+    def calc_slope(x_norm:pd.Series, y_norm:pd.Series, x_h:pd.Series, 
+                   x_l:pd.Series):
+        return((y_norm[x_h].values - y_norm[x_l].values) / 
+               (x_norm[x_h].values - x_norm[x_l].values)) 
+        
+    m_rise = calc_slope(x_norm, y_norm, x_rise_h, x_rise_l)
+    m_fall = calc_slope(x_norm, y_norm, x_fall_h, x_fall_l)
+
     # Calculate intercept for rising and falling limb
-    q_rise=(((x_norm[x_rise_h].values * y_norm[x_rise_l].values) - 
-             (x_norm[x_rise_l].values * y_norm[x_rise_h].values)) / 
-             (x_norm[x_rise_h].values - x_norm[x_rise_l].values)) 
-    q_fall=(((x_norm[x_fall_l].values * y_norm[x_fall_h].values) - 
-             (x_norm[x_fall_h].values * y_norm[x_fall_l].values)) / 
-             (x_norm[x_fall_l].values - x_norm[x_fall_h].values)) 
+    def calc_intercept(x_norm:pd.Series, y_norm:pd.Series, x_h:pd.Series, 
+                       x_l:pd.Series):
+        return (((x_norm[x_h].values * y_norm[x_l].values) - 
+                 (x_norm[x_l].values * y_norm[x_h].values)) / 
+                 (x_norm[x_h].values - x_norm[x_l].values)) 
+        
+    q_rise = calc_intercept(x_norm, y_norm, x_rise_h, x_rise_l)
+    q_fall = calc_intercept(x_norm, y_norm, x_fall_h, x_fall_l)
     
     y_fixed_rise = pd.Series(0, index=x_fixed.index)
     y_fixed_fall = pd.Series(0, index=x_fixed.index)
@@ -184,10 +192,8 @@ def y_for_x_fixed(x_rise_h:pd.Series, x_rise_l:pd.Series, x_fall_h:pd.Series,
             y_fixed_fall.iloc[k] = y_norm[x_fall_h[k]]
         else:
             y_fixed_fall.iloc[k] = m_fall[k] * x_fixed[k] + q_fall[k]
-            
     
     return y_fixed_rise, y_fixed_fall
-
 
 
 def area_hysteresis_index(x_fixed:pd.Series, y_fixed_rise:pd.Series, 
@@ -217,10 +223,9 @@ def force_linearity(rise_area:pd.Series, fall_area:pd.Series,
                     diff_area:pd.Series, h: float, x_fixed:pd.Series):
     """not sure what this function is supposed to be doing"""
     # Forcing linearity (no loop) = 0
-    for to_fix in [rise_area, fall_area, diff_area]:
-        for k in range(len(x_fixed)-1):
-            if np.isnan(to_fix[k]):
-                to_fix[k] = 0
+    rise_area.fillna(0, inplace=True)
+    fall_area.fillna(0, inplace=True)
+    diff_area.fillna(0, inplace=True)
     if np.isnan(h):
         h=0
     return rise_area, fall_area, diff_area, h
@@ -231,85 +236,60 @@ def find_hysteresis_class(x:pd.Series, y:pd.Series, min_dA:float,
     """
     Finds the hysteresis class based on the values calculated beforehand
     """
+    # First check for the rising limb
     pos_max_x = x.index.get_loc(x.idxmax())
     min_y_rise = min(y.iloc[:pos_max_x + 1])
     max_y_rise = max(y.iloc[:pos_max_x + 1])
     change_max_y_rise = abs(max_y_rise - y[0])
     change_min_y_rise = abs(min_y_rise - y[0])
-    
-    if change_max_y_rise > change_min_y_rise:
-        if min_dA > 0 and max_dA > 0:
-            hyst_class = 1
-        else:
-            if min_dA < 0 and max_dA < 0:
-                hyst_class = 4
-            else:
-                if min_dA <= 0 and max_dA > 0 and h >= 0:
-                    hyst_class = 2
-                else:
-                    if min_dA < 0 and max_dA >= 0 and h<0:
-                        hyst_class = 3
-                    else:
-                        hyst_class = 0 # linearity
-                
-    if change_max_y_rise < change_min_y_rise:
-        if min_dA > 0 and max_dA > 0:
-            hyst_class = 5
-        else:
-            if min_dA < 0 and max_dA < 0:
-                hyst_class = 8
-            else:
-                if min_dA <= 0 and max_dA > 0 and h >= 0:
-                    hyst_class = 6
-                else:
-                    if min_dA < 0 and max_dA >= 0 and h < 0:
-                        hyst_class= 7 
-                    else:
-                        hyst_class = 0 # linearity
-    
-    
-    if change_max_y_rise == change_min_y_rise:
-        pos_max_x = x.index.get_loc(x.idxmax())
+    if change_max_y_rise != change_min_y_rise:
+        hyst_class = determine_class(min_dA, max_dA, h, 
+                        change_max_y_rise, change_min_y_rise) 
+        
+    # If this does not yield results, check for the falling limb    
+    else: #  change_max_y_rise == change_min_y_rise
         min_y_fall = min(y.iloc[pos_max_x:])
         max_y_fall = max(y.iloc[pos_max_x:])
         change_max_y_fall = abs(max_y_fall - y[0])
         change_min_y_fall = abs(min_y_fall - y[0])
-
-        if change_max_y_fall > change_min_y_fall:
-            if min_dA > 0 and max_dA > 0:
-                hyst_class = 1
-            else:
-                if min_dA < 0 and max_dA < 0:
-                    hyst_class = 4
-                else:
-                    if min_dA <= 0 and max_dA > 0 and h >= 0:
-                        hyst_class = 2
-                    else:
-                        if min_dA < 0 and max_dA >= 0 and h < 0:
-                            hyst_class = 3
-                        else:
-                            hyst_class = 0 # linearity
-        else:
-            if change_max_y_fall < change_min_y_fall:
-                if min_dA > 0 and max_dA > 0:
-                    hyst_class = 5
-                else:
-                    if min_dA < 0 and max_dA < 0:
-                        hyst_class = 8
-                    else:
-                        if min_dA <= 0 and max_dA > 0 and h >= 0:
-                            hyst_class = 6
-                        else:
-                            if min_dA < 0 and max_dA >= 0 and h < 0:
-                                hyst_class = 7
-                            else:
-                                hyst_class = 0 # linearity
-
-        if change_max_y_fall == change_min_y_fall:
+        if change_min_y_fall != change_max_y_fall:
+            hyst_class = determine_class(min_dA, max_dA, h, 
+                            change_max_y_fall, change_min_y_fall) 
+        else: # change_min_y_fall == change_max_y_fall
             hyst_class = 0
 
     return hyst_class
 
+
+def determine_class(min_dA:float, max_dA:float, h:float, 
+                    change_max_y:float, change_min_y:float):
+    """Goes through all possible cases"""
+    if change_max_y > change_min_y:
+        if min_dA > 0 and max_dA > 0:
+            hyst_class = 1
+        elif min_dA < 0 and max_dA < 0:
+            hyst_class = 4
+        elif min_dA <= 0 and max_dA > 0 and h >= 0:
+            hyst_class = 2
+        elif min_dA < 0 and max_dA >= 0 and h<0:
+            hyst_class = 3
+        else:
+            hyst_class = 0 # linearity
+                
+    else: # change_max_y < change_min_y
+        if min_dA > 0 and max_dA > 0:
+            hyst_class = 5
+        elif min_dA < 0 and max_dA < 0:
+            hyst_class = 8
+        elif min_dA <= 0 and max_dA > 0 and h >= 0:
+            hyst_class = 6
+        elif min_dA < 0 and max_dA >= 0 and h < 0:
+            hyst_class= 7 
+        else:
+            hyst_class = 0 # linearity
+            
+    return hyst_class
+    
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
