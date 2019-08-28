@@ -133,7 +133,25 @@ def find_all_exp(dataframes:dict, water_year=False):
         print(catch)
 
     return parameters_all_catchments, least_squares_all_catchments
-                
+  
+def determine_simple_complex(least_squares_all_catchments):
+    """ Determines if a catchment is complex or simple, based on how good
+    its datapoints fit the exponential function. For all catchment considered
+    the median value for the mean least squares is  0.011456798341574162"""
+    type_simple_complex = pd.DataFrame(columns=least_squares_all_catchments.columns, index=least_squares_all_catchments.index)
+    for catch in least_squares_all_catchments.columns:
+        for year in least_squares_all_catchments.index:
+            if least_squares_all_catchments.loc[year, catch] > 0.011456798341574162:
+                type_simple_complex.loc[year, catch] = 2 # complex
+            elif least_squares_all_catchments.loc[year, catch] < 0.011456798341574162: 
+                type_simple_complex.loc[year, catch] = 1 # simple
+            else:
+                type_simple_complex.loc[year, catch] = np.nan
+    type_simple_complex = type_simple_complex[type_simple_complex.columns].astype(float)
+    return type_simple_complex
+            
+    
+              
         
 def find_exponential_function(x,y):
     """ Finds the best parameter values for an exponential function"""
