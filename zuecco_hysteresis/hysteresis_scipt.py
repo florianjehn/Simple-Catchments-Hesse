@@ -7,7 +7,6 @@ Script for the computation of the hysteresis index by G. Zuecco (2016)
 """
 import pandas as pd
 import numpy as np
-import time
 
 
 def hysteresis_class(x:pd.Series,y:pd.Series,x_fixed:pd.Series):
@@ -168,8 +167,8 @@ def y_for_x_fixed(x_rise_h:pd.Series, x_rise_l:pd.Series, x_fall_h:pd.Series,
     # Calculate the slope for rising and falling limb
     def calc_slope(x_norm:pd.Series, y_norm:pd.Series, x_h:pd.Series, 
                    x_l:pd.Series):
-        return((y_norm[x_h].values - y_norm[x_l].values) / 
-               (x_norm[x_h].values - x_norm[x_l].values)) 
+        return pd.Series(((y_norm[x_h].values - y_norm[x_l].values) / 
+               (x_norm[x_h].values - x_norm[x_l].values)))
         
     m_rise = calc_slope(x_norm, y_norm, x_rise_h, x_rise_l)
     m_fall = calc_slope(x_norm, y_norm, x_fall_h, x_fall_l)
@@ -177,9 +176,9 @@ def y_for_x_fixed(x_rise_h:pd.Series, x_rise_l:pd.Series, x_fall_h:pd.Series,
     # Calculate intercept for rising and falling limb
     def calc_intercept(x_norm:pd.Series, y_norm:pd.Series, x_h:pd.Series, 
                        x_l:pd.Series):
-        return (((x_norm[x_h].values * y_norm[x_l].values) - 
+        return pd.Series((((x_norm[x_h].values * y_norm[x_l].values) - 
                  (x_norm[x_l].values * y_norm[x_h].values)) / 
-                 (x_norm[x_h].values - x_norm[x_l].values)) 
+                 (x_norm[x_h].values - x_norm[x_l].values)))
         
     q_rise = calc_intercept(x_norm, y_norm, x_rise_h, x_rise_l)
     q_fall = calc_intercept(x_norm, y_norm, x_fall_h, x_fall_l)
@@ -190,13 +189,13 @@ def y_for_x_fixed(x_rise_h:pd.Series, x_rise_l:pd.Series, x_fall_h:pd.Series,
     # Calculate the y values    
     for k in range(len(x_fixed)):
         if np.isnan(m_rise[k]):
-            y_fixed_rise.iloc[k] = y_norm[x_rise_h[k]]
+            y_fixed_rise.iloc[k] = y_norm.iloc[x_rise_h.iloc[k]]
         else:
-            y_fixed_rise.iloc[k] = m_rise[k] * x_fixed[k] + q_rise[k]
+            y_fixed_rise.iloc[k] = m_rise.iloc[k] * x_fixed.iloc[k] + q_rise.iloc[k]
         if np.isnan(m_fall[k]):
-            y_fixed_fall.iloc[k] = y_norm[x_fall_h[k]]
+            y_fixed_fall.iloc[k] = y_norm.iloc[x_fall_h.iloc[k]]
         else:
-            y_fixed_fall.iloc[k] = m_fall[k] * x_fixed[k] + q_fall[k]
+            y_fixed_fall.iloc[k] = m_fall.iloc[k] * x_fixed.iloc[k] + q_fall.iloc[k]
     
     return y_fixed_rise, y_fixed_fall
 
@@ -233,8 +232,8 @@ def find_hysteresis_class(x:pd.Series, y:pd.Series, min_dA:float,
     pos_max_x = x.index.get_loc(x.idxmax())
     min_y_rise = min(y.iloc[:pos_max_x + 1])
     max_y_rise = max(y.iloc[:pos_max_x + 1])
-    change_max_y_rise = abs(max_y_rise - y[0])
-    change_min_y_rise = abs(min_y_rise - y[0])
+    change_max_y_rise = abs(max_y_rise - y.iloc[0])
+    change_min_y_rise = abs(min_y_rise - y.iloc[0])
     if change_max_y_rise != change_min_y_rise:
         hyst_class = determine_class(min_dA, max_dA, h, 
                         change_max_y_rise, change_min_y_rise) 
