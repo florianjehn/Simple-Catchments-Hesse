@@ -91,23 +91,7 @@ cleaned = ['gauge', 'leitercharackter_huek250', 'hohlraumart_huek250',
 # Go the the cleaned data folder
 os.chdir(os.path.abspath(os.path.join(file_dir, os.pardir+os.sep))+os.sep+"cleaned_data")
 # Save
-att_df[cleaned].to_csv("cleaned_attributes.csv", sep=";")
+att_df[cleaned].to_csv("cleaned_catchment_attributes.csv", sep=";")
 
 
 
-#def classify_narrowness(att_df):
-#    """
-#    Classifies the narrowness of the catchments
-#    """
-#    att_df["ratio"] = att_df["laenge"] / att_df["breite"]
-#  #  att_df["narrowness"] = "equal_sided"
-#    # from https://stackoverflow.com/questions/44659040/pandas-assign-category-based-on-where-value-falls-in-range    
-#    def cat(x):
-#        if x > 1.2 and x < 1.4 or x < 0.8 and x > 0.6:
-#            return "narrow"
-#        if x > 1.4 or x < 0.6:
-#            return "very narrow"
-#        return "equal sided"
-#
-#    att_df["narrowness"] = att_df["ratio"].apply(lambda x: cat(x))
-#    return att_df

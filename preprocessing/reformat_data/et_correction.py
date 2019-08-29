@@ -76,6 +76,18 @@ def plot_storage(dataframes: dict, attribs: pd.DataFrame):
         plt.plot(np.cumsum(df.P - df.E * fET - df.Q), label=attribs.loc[catch].gauge,
                  color="grey", linewidth=0.5)
         plt.ylabel('S(t) [mm]')
+        
+def save_corrected_ET_single(dataframes:dict):
+    """
+    Saves the corrected ET in a single file, only containing ET values
+    """
+    all_et = pd.DataFrame(index=dataframes[list(dataframes.keys())[0]].index, columns = list(dataframes.keys()))
+    for catch in dataframes.keys():
+        all_et[catch] = dataframes[catch]["E_cor"]
+    all_et.to_csv("et_mm_1991_2018_corrected.csv",sep=";")
+    
+    
+    
 
 
 if __name__ == '__main__':
@@ -86,6 +98,7 @@ if __name__ == '__main__':
     dataframes = ccdt.get_table_dict()
     attribs = ccdt.get_attributes()
     correct_and_save_ET(dataframes)
+    save_corrected_ET_single(dataframes)
     
   #  plot_storage(dataframes, attribs)
     plot_correction_effect(dataframes)

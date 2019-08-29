@@ -2,14 +2,14 @@ import pandas as pd
 import os
 home = os.path.dirname(__file__) 
 
-def get_table_dict(calc_water_year=False):
+def get_table_dict(calc_water_year=False, et_corrected=False):
     """
     Loads the csv data and return a dict with catchment id as key and a dataframe as value
     """
-
-    matQ = pd.read_csv(home + '/dis_mm_1991_2018.csv', delimiter=';', parse_dates=[0], index_col=0)
-    matE = pd.read_csv(home + '/et_mm_1991_2018.csv', delimiter=';', parse_dates=[0], index_col=0)
-    matP = pd.read_csv(home + '/prec_mm_1991_2018.csv', delimiter=';', parse_dates=[0], index_col=0)
+    
+    matQ = pd.read_csv(home + os.sep + 'dis_mm_1991_2018.csv', delimiter=';', parse_dates=[0], index_col=0)
+    matE = pd.read_csv(home + os.sep + 'et_mm_1991_2018_uncorrected.csv', delimiter=';', parse_dates=[0], index_col=0)
+    matP = pd.read_csv(home + os.sep + 'prec_mm_1991_2018.csv', delimiter=';', parse_dates=[0], index_col=0)
 
 
     dataframes = {}
@@ -52,7 +52,7 @@ def water_year(df:pd.DataFrame):
 
 def get_attributes():
 
-    return pd.read_csv(home + '/cleaned_attributes.csv', delimiter=';', index_col=0)
+    return pd.read_csv(home + os.sep + 'cleaned_catchment_attributes.csv', delimiter=';', index_col=0)
 
 
 if __name__ == "__main__":

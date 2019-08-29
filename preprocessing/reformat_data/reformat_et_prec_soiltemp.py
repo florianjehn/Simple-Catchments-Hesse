@@ -69,6 +69,10 @@ def read_prec(start_date, end_date, mapping):
     """
     return read_averaged_data("regnie", "Prec", mapping).loc[start_date:end_date,:]
 
+def read_soiltemp(start_date, end_date, mapping):
+    return read_averaged_data("soil_temperature_5cm", "soil_temp_5cm", mapping).loc[start_date:end_date,:]
+    
+
 def save_df(df, name):
     """
     saves a df in the cleaned data folder
@@ -84,7 +88,11 @@ if __name__ == "__main__":
     start_date = datetime.date(1991, 1, 1)
     end_date = datetime.date(2018, 12, 31)
     mapping = {v: k for k, v in read_mapping().items()}
-    et_df = read_et(start_date, end_date,mapping)
-    save_df(et_df, "et_mm_1991_2018.csv")
     prec_df = read_prec(start_date, end_date, mapping)
     save_df(prec_df, "prec_mm_1991_2018.csv")
+    temp_df = read_soiltemp(start_date, end_date, mapping)
+    save_df(temp_df, "soil_temp_C_1991_2018.csv")
+    # This creates only the uncorrected ET
+#    et_df = read_et(start_date, end_date,mapping)
+#    save_df(et_df, "et_mm_1991_2018.csv")
+
