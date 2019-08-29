@@ -11,3 +11,4 @@ analyzing/%USERPROFILE/.spyder-py3/onlinehelp
 analyzing/%USERPROFILE/.spyder-py3/workingdir
 analyzing/poly_test.py
 analyzing/baseflow_test.py
+*.pyc
