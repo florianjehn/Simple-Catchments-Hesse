@@ -50,10 +50,17 @@ def water_year(df:pd.DataFrame):
     df["month_of_water_year"] = list(map(shift_month, list(df.index.month)))
 
 
-def get_attributes():
+def get_attributes_catchments_cat():
 
-    return pd.read_csv(home + os.sep + 'cleaned_catchment_attributes.csv', delimiter=';', index_col=0)
+    return pd.read_csv(home + os.sep + 'cleaned_catchment_attributes_cat.csv', delimiter=';', index_col=0)
 
+def get_attributes_catchments_num():
+
+    return pd.read_csv(home + os.sep + 'cleaned_catchment_attributes_num.csv', delimiter=';', index_col=0)
+
+def get_attributes_years():
+
+    return pd.read_csv(home + os.sep + 'cleaned_year_attributes.csv', delimiter=';', index_col=0)
 
 if __name__ == "__main__":
     dataframes = get_table_dict(calc_water_year=True)
