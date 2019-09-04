@@ -13,7 +13,9 @@ import matplotlib as mpl
 import matplotlib.patches as mpatches
 import os
 import sys
+import numpy as np
 import math
+import scipy
 # add the whole package to the path
 file_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.sep.join(file_dir.split(os.sep)[:-1]))
@@ -39,7 +41,7 @@ def measure_categorical_variability(categorical_data:list):
     
 def calculate_categorical_variability(df, axis=0):
     """
-    Calculates the variability of a dataframe, either by row (axis=0) or 
+    Calculates the categorical variability of a dataframe, either by row (axis=0) or 
     by column (axis=1)
     """
     if axis == 0:
@@ -74,7 +76,7 @@ def plot_differences_catchments_years(type_catchment, attributes, variability, a
 
     # Get the predominant type for every year/catchment
     if year_catch == "catch":
-        mode = type_catchment.mode(axis=1).iloc[0,:]
+        mode = type_catchment.mode(axis=0).iloc[0,:]
     elif year_catch == "year":
         mode = type_catchment.mode(axis=1).iloc[:,0]
 
@@ -90,6 +92,7 @@ def plot_differences_catchments_years(type_catchment, attributes, variability, a
         variability_of_type = variability.loc[of_type]
         # get those with the lowest variability (e.g. catchments that are always complex)
         most_homogen[type_catch] = variability_of_type.sort_values(by=0).head(amount_homogen).index.astype(float)
+        print(most_homogen[type_catch])
         
     # Create a figure for every attribute
     for att in attributes.columns:
@@ -104,15 +107,26 @@ def plot_differences_catchments_years(type_catchment, attributes, variability, a
         all_types = pd.concat([attributes_for_types[type_catch] for type_catch in attributes_for_types.keys()],axis=1)
         all_types.columns = [mapping[col] for col in all_types.columns]
 
-        # if they are not flaot they should be categorical
-        if attributes[att].dtypes != float:
+        # if they are not flaot or int they should be categorical
+        if attributes[att].dtypes != np.float64 and attributes[att].dtypes != np.int64:
             all_types_by_cat = pd.concat([all_types.groupby(col).count() for col in all_types.columns],axis=1)
+            all_types_by_cat = all_types_by_cat[all_types_by_cat.columns[::-1]]
             ax = all_types_by_cat.transpose().plot(kind="bar", stacked=True)
+            ax.set_title(year_catch + "; attribute: " + att)
+
         else:
-            ax = all_types.plot(kind="box")            
+            ax = all_types.plot(kind="box") 
+            # Do a corrected t test to see if they are significantly different
+            statistic, p_value = scipy.stats.ranksums(all_types["simple"], all_types["complex"])
+#            bonferroni = 11 if year_catch == "year" else 15
+#            p_value = p_value * bonferroni
+            ax.set_title(year_catch + "; attribute: " + att + "; p_val: "+str(np.round(p_value,decimals=3)))
             
-        ax.set_title(year_catch + "; attribute: " + att)
-        plt.savefig(year_catch + "_attribute_" + att + "_n_is_" + str(amount_homogen) + ".png", dpi=150)
+            
+        fig = plt.gcf()
+        fig.tight_layout()
+        plt.savefig(year_catch + "_attribute_" + att + "_n_is_" + str(amount_homogen) + ".png", dpi=150,
+                    bbox_inches="tight")
         plt.close()      
 
 
@@ -132,5 +146,5 @@ if __name__ == "__main__":
    variability_catch = calculate_categorical_variability(type_catchment, axis=1)
    variability_catch = variability_catch[variability_catch.columns].astype(float)
    
-   #plot_differences_catchments_years(type_catchment,catchments,  variability_catch, 10, "catch")
+   plot_differences_catchments_years(type_catchment,catchments,  variability_catch, 9, "catch")
    plot_differences_catchments_years(type_catchment, years,  variability_year, 3, "year")

@@ -200,7 +200,7 @@ if __name__ == '__main__':
     et_cor.correct_and_save_ET(dataframes)
     calculate_dS(dataframes)
     
-    parameters_all_catchments, least_squares_all_catchments = find_all_exp(dataframes, water_year=True)
+#    parameters_all_catchments, least_squares_all_catchments = find_all_exp(dataframes, water_year=True)
   #  extreme_areas = calculate_extreme_areas(dataframes, water_year=True)
  #   percentiles_flood, percentiles_delay = find_percentiles(extreme_areas)
  #   type_of_catchment = determine_class(extreme_areas, percentiles_flood, percentiles_delay, 0.8)

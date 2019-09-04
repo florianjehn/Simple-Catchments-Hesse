@@ -55,8 +55,9 @@ def get_attributes_catchments_cat():
     return pd.read_csv(home + os.sep + 'cleaned_catchment_attributes_cat.csv', delimiter=';', index_col=0)
 
 def get_attributes_catchments_num():
-
-    return pd.read_csv(home + os.sep + 'cleaned_catchment_attributes_num.csv', delimiter=';', index_col=0)
+    attributes = pd.read_csv(home + os.sep + 'cleaned_catchment_attributes_num.csv', delimiter=';', index_col=0)
+    attributes["dominating_soil_type_bk500"] = attributes["dominating_soil_type_bk500"].str.replace(" ", "")
+    return attributes
 
 def get_attributes_years():
 

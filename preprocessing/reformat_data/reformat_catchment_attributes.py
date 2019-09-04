@@ -92,7 +92,7 @@ cleaned_cat = ['gauge', 'leitercharackter_huek250', 'hohlraumart_huek250',
        'height_max_cat', 'elongation_ratio_cat', 'height_difference_cat', "et_mean_cat",
        "dis_mean_cat", "prec_mean_cat", "runoff_ratio_cat"]
 cleaned_num = []
-for item in cleaned:
+for item in cleaned_cat:
     if "cat" in item:
         cleaned_num.append(item[:-4])
     else:
