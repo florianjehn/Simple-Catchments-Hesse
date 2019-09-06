@@ -111,8 +111,6 @@ def calc_snow_fraction(prec, air_temp, water_year):
     below_0 = combined[combined["air_temp"] < 0].groupby("water_year")["prec"].sum()
     return below_0/all_prec
     
-    
-
 
 def find_longest_dry_spell(grouped_years):
     """Finds the longest dry spell for all years"""
