@@ -9,6 +9,7 @@ file_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.sep.join(file_dir.split(os.sep)[:-1]))
 
 
+
 def scatter_violin_least_squares_attribute(catch_year, least_squares, axis):
     """
     Plots the attributes of the years or catchments in a scatterplot 
@@ -42,7 +43,18 @@ def scatter_violin_least_squares_attribute(catch_year, least_squares, axis):
         #    print(all_data_attribute[attribute])
 
         else:
-            ax.scatter(all_data_attribute[attribute],all_data_attribute["catchment_least_square"])
+            x = all_data_attribute[attribute].astype(float)
+#            if x is None:
+#                continue
+            #print(x)
+            y = all_data_attribute["catchment_least_square"]
+            print(y)
+            ax.scatter(x,y, s=0.1)
+#            fit = np.polyfit(x,y , deg=2)
+#            func = np.poly1d(fit)
+#            y_sim = func(x)
+#            ax.plot(x,y_sim, color="red")
+            
         ax.set_title(attribute)
         ax.set_xlabel(attribute)
         ax.set_ylabel("least square error")
