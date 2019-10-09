@@ -44,14 +44,9 @@ def elongation_ratio(area_catchment, max_basin_length):
     return diameter_catchment_circle / max_basin_length
 
 
-def height_difference(height_max, height_min):
-    return height_max - height_min
-
-
-def calculate_elongation_and_height(att_df):
+def calculate_elongation(att_df):
     """Calculate the elongation ratio for all catchments"""
     att_df["elongation_ratio"] = list(map(elongation_ratio, att_df["area_m2_watershed"], att_df["max_flow_len"]))
-    att_df["height_difference"] = list(map(height_difference, att_df["height_max"], att_df["height_min"]))
     return att_df
 
 
@@ -77,20 +72,21 @@ def read_df(name):
        
 # Get the data, add some and sort it
 att_df = read_attributes()
-att_df = calculate_elongation_and_height(att_df)
+att_df = calculate_elongation(att_df)
 att_df = calculate_yearly_means(att_df)
 att_df["runoff_ratio"] = att_df["dis_mean"] / att_df["prec_mean"]
-#att_df = classify_numerical(att_df, 3, ["breite", "laenge", "ratio", "max_flow_len", "perimeter"])
 # Only use categories
-cleaned_cat = ['gauge', 'leitercharackter_huek250', 'hohlraumart_huek250',
+cleaned_cat = ['gauge', 
        'durchlässigkeit_huek250', 'dominating_soil_type_bk500',
-       'gesteinsart_huek250', 'soil_texture_boart_1000', 'land_use_corine',
-       'bodenausgangsgesteine_bag5000', 'bodengrosslandschaft_bgl5000','area_m2_watershed_cat',
-       'nFK_1m_FKD10dm_1000_cat', 'grundwasserneubildung_gwn_1000_cat',
-       'sickerwasserrate_mean_swr_1000_cat', 'greundigkeit_physgru_1000_cat',
-       'slope_mean_dem_40_cat', 'height_mean_dem_40_cat', 'height_min_cat',
-       'height_max_cat', 'elongation_ratio_cat', 'height_difference_cat', "et_mean_cat",
+       'land_use_corine',
+       'area_m2_watershed_cat',
+       'grundwasserneubildung_gwn_1000_cat',
+       'greundigkeit_physgru_1000_cat',
+       'slope_mean_dem_40_cat',  
+       'elongation_ratio_cat', "et_mean_cat",
        "dis_mean_cat", "prec_mean_cat", "runoff_ratio_cat"]
+
+
 cleaned_num = []
 for item in cleaned_cat:
     if "cat" in item:

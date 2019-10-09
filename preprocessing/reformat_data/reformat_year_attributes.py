@@ -59,47 +59,53 @@ def calc_yearly_means(df, data_type ,water_year=False):
     return yearly_data.iloc[:,0]
     
 
-def calc_yearly_attributes(df, water_year = False):
+def calc_yearly_attributes(prec, pet, water_year = False):
     """Calculates a bunch of attributes for the different years"""
-    daily_means = prepare_data(df, water_year=water_year)
-    grouper = "water_year" if water_year else df.index.year
+    daily_means = prepare_data(prec, water_year=water_year)
+    grouper = "water_year" if water_year else prec.index.year
     years = list(set(daily_means["water_year"].values)) if water_year else list(set(daily_means.index.year))
     grouped_years = daily_means.groupby(grouper)
     attributes = pd.DataFrame(index = years)
-    attributes["longest_dry_spell"] = find_longest_dry_spell(grouped_years)
-    attributes["dry_days"] = find_dry_days(grouped_years)
-    attributes["longest_rain_period"] = find_longest_rain_period(grouped_years)
-    attributes["rain_days"] = find_rain_days(grouped_years)
     attributes["most_rain_one_day"] = find_most_rain_one_day(grouped_years)
     attributes["most_rain_one_month"] = find_most_rain_one_month(grouped_years, water_year=water_year)
-    attributes["least_rain_one_month"] = find_least_rain_one_month(grouped_years, water_year=water_year)
     attributes["rainfall_seasonality"] = calc_rainfall_seasonality(grouped_years, water_year=water_year)#
     air_temp = calculate_air_temperature()
     attributes["mean_air_temperature"] = calc_yearly_means(air_temp, "air_temp", water_year=water_year)
-    attributes["days_with_snow"] = calc_snow_days(prec, air_temp, water_year)
-    attributes["days_below_0_C"] = calc_freezing_days(air_temp, water_year)
     attributes["snow_fraction"] = calc_snow_fraction(prec,air_temp, water_year)
-
+    attributes["aridity"] = calc_aridity(prec, pet, water_year)
     print(attributes)
     return attributes
    
-def calc_snow_days(prec,air_temp, water_year):
-    """Calculates how many days below 0°C had precipitation"""
+    
+def calc_aridity(prec, pet, water_year):
+    """Calculates the aridity as described in Knoben et al (2018)"""
     prec = prepare_data(prec, water_year=water_year)
-    air_temp = prepare_data(air_temp, water_year=water_year)
-    combined = pd.concat([air_temp.iloc[:,0],prec.iloc[:,:2]],axis=1)
-    combined.columns = ["air_temp", "prec", "water_year"]
-    combined = combined[combined["air_temp"] < 0]
-    combined = combined[combined["prec"] > 0]
-    combined = combined.groupby("water_year").count()
-    return combined.iloc[:,0]
+    pet = prepare_data(pet, water_year=water_year)
+    prec_pet = pd.concat([prec[0],pet.iloc[:,0:2]],axis=1)
 
+    prec_pet.columns = ["prec", "pet", "water_year"]
+    yearly_aridity = []
+    for year, year_df in prec_pet.groupby("water_year"):
+        daily_moisture_index = []
+        
+        for day in year_df.index:
+            daily_moisture_index.append(moisture_index(year_df.loc[day,"prec"], year_df.loc[day,"pet"]))
+        aridity = np.array(daily_moisture_index).mean()
+        yearly_aridity.append(aridity)
+        
+    return yearly_aridity
+    
 
-def calc_freezing_days(air_temp,water_year):
-    """Calculates how many days are below 0°C"""
-    air_temp = prepare_data(air_temp, water_year=water_year)
-    air_temp = air_temp[air_temp.iloc[:,0] < 0]
-    return air_temp.groupby("water_year").count().iloc[:,0]
+def moisture_index(prec_t, pet_t):
+    """Calculates the moisture index for a time step
+    Thornthwaite’s moisture index MI (Willmott & Feddema, 1992)"""
+    if prec_t > pet_t:
+        return 1 - (pet_t/prec_t)
+    elif prec_t == pet_t:
+        return 0
+    else:
+        return (prec_t/pet_t) - 1
+    
 
 def calc_snow_fraction(prec, air_temp, water_year):
     """Calculates how much of the precipitation falls below 0°C"""
@@ -112,59 +118,6 @@ def calc_snow_fraction(prec, air_temp, water_year):
     return below_0/all_prec
     
 
-def find_longest_dry_spell(grouped_years):
-    """Finds the longest dry spell for all years"""
-    dryspell_by_year = {}
-    for year, year_df in grouped_years:
-        longest_dryspell_overall = 0
-        longest_dryspell_current = 0
-        yearly_prec = year_df.iloc[:,0]
-        for day in yearly_prec.index:
-            if yearly_prec.loc[day] == 0:
-                longest_dryspell_current += 1
-                if longest_dryspell_current > longest_dryspell_overall:
-                    longest_dryspell_overall = longest_dryspell_current
-            else:
-                longest_dryspell_current = 0
-        dryspell_by_year[year] = longest_dryspell_overall
-    return pd.Series(dryspell_by_year)
-
-def find_dry_days(grouped_years):
-    """Counts how many dry days are happening in all the years"""
-    dry_days_by_year = {}
-    for year, year_df in grouped_years:
-        yearly_prec = year_df.iloc[:,0]
-        dry_days_by_year[year] = yearly_prec[yearly_prec == 0].count()
-    return pd.Series(dry_days_by_year)
-
-
-def find_longest_rain_period(grouped_years):
-    """Finds the longest rain_period for all years"""
-    rain_period_by_year = {}
-    for year, year_df in grouped_years:
-        longest_rain_period_overall = 0
-        longest_rain_period_current = 0
-        yearly_prec = year_df.iloc[:,0]
-        for day in yearly_prec.index:
-            if yearly_prec.loc[day] > 0:
-                longest_rain_period_current += 1
-                if longest_rain_period_current > longest_rain_period_overall:
-                    longest_rain_period_overall = longest_rain_period_current
-            else:
-                longest_rain_period_current = 0
-        rain_period_by_year[year] = longest_rain_period_overall
-    return pd.Series(rain_period_by_year)
-
-
-def find_rain_days(grouped_years):
-    """Counts how many dry days are happening in all the years"""
-    dry_days_by_year = {}
-    for year, year_df in grouped_years:
-        yearly_prec = year_df.iloc[:,0]
-        dry_days_by_year[year] = yearly_prec[yearly_prec > 0].count()
-    return pd.Series(dry_days_by_year)
-
-
 def prepare_data(df, water_year=False):
     """Prepares the precipitation data, so it can be used more easily in other 
     functinos"""
@@ -174,7 +127,6 @@ def prepare_data(df, water_year=False):
         daily_means = daily_means[daily_means["water_year"] != 1991]
         daily_means = daily_means[daily_means["water_year"] != 2019]
     return daily_means
-
 
 
 def find_most_rain_one_day(grouped_years):
@@ -251,7 +203,8 @@ if __name__ == "__main__":
         
     cleaned_year_attributes = pd.concat(yearly_means,axis=1)
     prec = dfs["prec_mm_1991_2018.csv"]
-    additional_attributes = calc_yearly_attributes(prec, water_year=True)
+    pet = dfs["et_mm_1991_2018_corrected.csv"]
+    additional_attributes = calc_yearly_attributes(prec, pet, water_year=True)
     cleaned_year_attributes= pd.concat([cleaned_year_attributes, additional_attributes],axis=1)
 
     
