@@ -18,7 +18,6 @@ import math
 from scipy.optimize import curve_fit
 
 
-
 def plot_Q_vs_cumdS_scatter(dataframes, water_year=False):
     """
     Plots Q vs cumdS for seperated by year and river
@@ -150,8 +149,6 @@ def determine_simple_complex(least_squares_all_catchments):
     type_simple_complex = type_simple_complex[type_simple_complex.columns].astype(float)
     return type_simple_complex
             
-    
-              
         
 def find_exponential_function(x,y):
     """ Finds the best parameter values for an exponential function"""
@@ -177,7 +174,6 @@ def calculate_dS(dataframes:dict):
         df = dataframes[catch]
         df["dS"] = df.P - df.E_cor - df.Q
         
-        
 
 def normalize(series:pd.Series):
     return ((series - series.min()) / (series.max() - series.min()))  
@@ -192,7 +188,7 @@ if __name__ == '__main__':
     dataframes = {}
     for catch in list(in_dfs.keys())[:]:
         # Skip catchments with much missing or stepwise data
-        if catch in [23950104, 24781159, 24781206, 428832990]:
+        if catch in [23950104, 24781159, 24781206, 428832990, 42870057]:
             print("Skipped: " + str(catch))
             continue
         dataframes[catch] = in_dfs[catch]
@@ -202,9 +198,7 @@ if __name__ == '__main__':
     
     parameters_all_catchments, least_squares_all_catchments = find_all_exp(dataframes, water_year=True)
     
-  #  extreme_areas = calculate_extreme_areas(dataframes, water_year=True)
- #   percentiles_flood, percentiles_delay = find_percentiles(extreme_areas)
- #   type_of_catchment = determine_class(extreme_areas, percentiles_flood, percentiles_delay, 0.8)
+    least_squares_all_catchments.to_csv("least_square_all_catchments.csv", sep=";")
     
     #plot_Q_vs_cumdS(dataframes, water_year=True)
    # plot_Q_vs_cumdS_line(dataframes, water_year=True)

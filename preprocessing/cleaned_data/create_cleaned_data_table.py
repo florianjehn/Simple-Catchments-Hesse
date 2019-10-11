@@ -50,10 +50,6 @@ def water_year(df:pd.DataFrame):
     df["month_of_water_year"] = list(map(shift_month, list(df.index.month)))
 
 
-def get_attributes_catchments_cat():
-
-    return pd.read_csv(home + os.sep + 'cleaned_catchment_attributes_cat.csv', delimiter=';', index_col=0)
-
 def get_attributes_catchments_num():
     attributes = pd.read_csv(home + os.sep + 'cleaned_catchment_attributes_num.csv', delimiter=';', index_col=0)
     attributes["dominating_soil_type_bk500"] = attributes["dominating_soil_type_bk500"].str.replace(" ", "")
