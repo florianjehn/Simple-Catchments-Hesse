@@ -7,9 +7,9 @@ def get_table_dict(calc_water_year=False, et_corrected=False):
     Loads the csv data and return a dict with catchment id as key and a dataframe as value
     """
     
-    matQ = pd.read_csv(home + os.sep + 'dis_mm_1991_2018.csv', delimiter=';', parse_dates=[0], index_col=0)
-    matE = pd.read_csv(home + os.sep + 'et_mm_1991_2018_uncorrected.csv', delimiter=';', parse_dates=[0], index_col=0)
-    matP = pd.read_csv(home + os.sep + 'prec_mm_1991_2018.csv', delimiter=';', parse_dates=[0], index_col=0)
+    matQ = pd.read_csv(home + os.sep + 'dis_mm_1991_2018.csv', delimiter=';', parse_dates=[0], index_col=0, dayfirst=True)
+    matE = pd.read_csv(home + os.sep + 'et_mm_1991_2018_uncorrected.csv', delimiter=';', parse_dates=[0], index_col=0, dayfirst=True)
+    matP = pd.read_csv(home + os.sep + 'prec_mm_1991_2018.csv', delimiter=';', parse_dates=[0], index_col=0, dayfirst=True)
 
 
     dataframes = {}
@@ -52,7 +52,7 @@ def water_year(df:pd.DataFrame):
 
 def get_attributes_catchments_num():
     attributes = pd.read_csv(home + os.sep + 'cleaned_catchment_attributes_num.csv', delimiter=';', index_col=0)
-    attributes["dominating_soil_type_bk500"] = attributes["dominating_soil_type_bk500"].str.replace(" ", "")
+    attributes["dominating_soil_type_bk500"] = attributes["dominating_soil_type_bk500"].str.replace(" ", "_")
     return attributes
 
 def get_attributes_years():
