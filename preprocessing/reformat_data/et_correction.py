@@ -96,7 +96,7 @@ if __name__ == '__main__':
     sys.path.append(os.sep.join(file_dir.split(os.sep)[:-2]))
     import preprocessing.cleaned_data.create_cleaned_data_table as ccdt
     dataframes = ccdt.get_table_dict()
-    attribs = ccdt.get_attributes()
+    attribs = ccdt.get_attributes_catchments_num()
     correct_and_save_ET(dataframes)
     save_corrected_ET_single(dataframes)
     

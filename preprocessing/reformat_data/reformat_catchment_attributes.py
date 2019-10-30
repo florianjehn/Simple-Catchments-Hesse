@@ -18,23 +18,6 @@ def read_attributes():
     return att_df
 
 
-#def classify_numerical(df, bins, skip_cols, labels=None):
-#    """
-#    Classifies all numerical columns of a dataframe to a defined number of 
-#    classes and returns the new df
-#    """
-#    for col in df.columns:
-#        # Skyp all non numericals
-#        if not np.issubdtype(df[col], np.number) or col in skip_cols:
-#            continue
-#        if labels is None:
-#            df[col+"_cat"] = pd.cut(df[col], bins=bins)
-#        else:
-#            df[col+"_cat"] = pd.cut(df[col], bins=bins, labels=labels)
-#
-#    return df
-
-
 def elongation_ratio(area_catchment, max_basin_length):
     """
     Calculates the elongation ration for a given catchment
@@ -66,7 +49,7 @@ def calculate_yearly_means(att_df):
 def read_df(name):
     os.chdir(os.path.abspath(os.path.join(file_dir, os.pardir+os.sep))+os.sep+"cleaned_data")
     df = pd.read_csv(name, sep=";", index_col=0)
-    df.index = pd.to_datetime(df.index)
+    df.index = pd.to_datetime(df.index, format='%Y-%m-%d')
     return df
     
        

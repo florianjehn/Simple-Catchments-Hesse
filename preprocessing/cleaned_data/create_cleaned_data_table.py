@@ -14,7 +14,7 @@ def get_table_dict(calc_water_year=False, et_corrected=False):
 
     dataframes = {}
 
-    for catch in matQ.columns:
+    for catch in matE.columns:
         df = pd.DataFrame()
         df['Q'] = matQ[catch]
         df['E'] = matE[catch]

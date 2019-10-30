@@ -43,7 +43,7 @@ def read_averaged_data(data_type, data_name, mapping):
             continue
         name = file.split(".")[0] 
         temp_df = pd.read_csv(file, index_col=0)
-        temp_df.index = pd.to_datetime(temp_df.index)
+        temp_df.index = pd.to_datetime(temp_df.index, format='%Y-%m-%d')
         # Handle the annoying German spelling
         split = name.split("_")            
         name = split[1] if len(split)==2 else " ".join(split[1:])

@@ -13,7 +13,7 @@ os.chdir(os.path.abspath(os.path.join(file_dir, os.pardir+os.sep))+os.sep+"clean
 
 def read_df(name):
     df = pd.read_csv(name, sep=";", index_col=0)
-    df.index = pd.to_datetime(df.index)
+    df.index = pd.to_datetime(df.index, format='%Y-%m-%d')
     return df
 
 
@@ -23,7 +23,7 @@ def calculate_delta_s(dis, prec, et):
     return dS
 
 
-et = read_df("et_mm_1991_2018.csv")
+et = read_df("et_mm_1991_2018_corrected.csv")
 prec = read_df("prec_mm_1991_2018.csv")
 dis = read_df("dis_mm_1991_2018.csv")
 dS = calculate_delta_s(dis, prec, et)
