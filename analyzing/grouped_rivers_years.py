@@ -137,14 +137,13 @@ def plot_differences_catchments_years_by_least_squares(least_squares, attributes
 
     # Get the predominant type for every year/catchment
     if year_catch == "catch":
-        median_least_squares = least_squares.median(axis=0)
+        mean_least_squares = least_squares.mean(axis=0)
     elif year_catch == "year":
-        median_least_squares = least_squares.median(axis=1)
+        mean_least_squares = least_squares.mean(axis=1)
         
     # Find the year/catchment that have the highest and lowest least square error
-
-    simple_catch_year = median_least_squares[median_least_squares < median_least_squares.quantile(amount_homogen)].index.astype(float)
-    complex_catch_year = median_least_squares[median_least_squares > median_least_squares.quantile(1-amount_homogen)].index.astype(float)
+    simple_catch_year = mean_least_squares[mean_least_squares < mean_least_squares.quantile(amount_homogen)].index.astype(float)
+    complex_catch_year = mean_least_squares[mean_least_squares > mean_least_squares.quantile(1-amount_homogen)].index.astype(float)
     most_homogen = {"simple": simple_catch_year, "complex":complex_catch_year}
         
     # Create a figure for every attribute
@@ -198,5 +197,5 @@ if __name__ == "__main__":
    variability_catch = calculate_categorical_variability(type_catchment, axis=1)
    variability_catch = variability_catch[variability_catch.columns].astype(float)
    
-   plot_differences_catchments_years_by_least_squares(least_squares,catchments,  variability_catch, 0.1, "catch")
-   plot_differences_catchments_years_by_least_squares(least_squares, years,  variability_year, 0.1, "year")
+   plot_differences_catchments_years_by_least_squares(least_squares, catchments,  variability_catch, 0.2, "catch")
+   plot_differences_catchments_years_by_least_squares(least_squares, years,  variability_year, 0.2, "year")
