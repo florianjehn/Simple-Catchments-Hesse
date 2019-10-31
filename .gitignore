@@ -14,3 +14,4 @@ analyzing/baseflow_test.py
 *.pyc
 *.pyc
 preprocessing/cleaned_data/__pycache__/create_cleaned_data_table.cpython-37.pyc
+*.pyc

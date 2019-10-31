@@ -8,7 +8,10 @@ def get_table_dict(calc_water_year=False, et_corrected=False):
     """
     
     matQ = pd.read_csv(home + os.sep + 'dis_mm_1991_2018.csv', delimiter=';', parse_dates=[0], index_col=0, dayfirst=True)
-    matE = pd.read_csv(home + os.sep + 'et_mm_1991_2018_uncorrected.csv', delimiter=';', parse_dates=[0], index_col=0, dayfirst=True)
+    if et_corrected:
+        matE = pd.read_csv(home + os.sep + 'et_mm_1991_2018_corrected.csv', delimiter=';', parse_dates=[0], index_col=0, dayfirst=True)
+    else:
+        matE = pd.read_csv(home + os.sep + 'et_mm_1991_2018_uncorrected.csv', delimiter=';', parse_dates=[0], index_col=0, dayfirst=True)
     matP = pd.read_csv(home + os.sep + 'prec_mm_1991_2018.csv', delimiter=';', parse_dates=[0], index_col=0, dayfirst=True)
 
 

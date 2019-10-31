@@ -170,7 +170,11 @@ def plot_differences_catchments_years_by_least_squares(least_squares, attributes
             ax.set_title(year_catch + "; attribute: " + att+ "; n="+str(len(simple_catch_year)))
 
         else:
-            ax = all_types.plot(kind="box") 
+            ax = sns.swarmplot(data=all_types)
+            ax = sns.boxplot(data=all_types, showcaps=False,boxprops={'facecolor':'None'},
+        showfliers=False,whiskerprops={'linewidth':0})
+      #      ax = all_types.plot(kind="box") 
+       #     print(all_types)
             # Do a corrected t test to see if they are significantly different
             statistic, p_value = scipy.stats.ranksums(all_types["simple"], all_types["complex"])
 #            bonferroni = 11 if year_catch == "year" else 15

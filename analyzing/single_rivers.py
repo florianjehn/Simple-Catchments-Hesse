@@ -9,7 +9,6 @@ import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
 # add the whole package to the path
 file_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.sep.join(file_dir.split(os.sep)[:-1]))
@@ -197,16 +196,11 @@ if __name__ == '__main__':
     calculate_dS(dataframes)
     
     parameters_all_catchments, least_squares_all_catchments = find_all_exp(dataframes, water_year=True)
-    
+    # Remove empty year 1991
+    least_squares_all_catchments.drop(least_squares_all_catchments.index[:1], inplace=True)
     least_squares_all_catchments.to_csv("least_square_all_catchments.csv", sep=";")
     
-    #plot_Q_vs_cumdS(dataframes, water_year=True)
-   # plot_Q_vs_cumdS_line(dataframes, water_year=True)
-   # plt.close()
-   # type_of_catchment = define_catchment_type_with_sum_ds(dataframes, water_year=True, monthly=True)
-  #  type_of_catchment_float = type_of_catchment[type_of_catchment.columns].astype(float)
-    
-   # sns.heatmap(type_of_catchment_float, square=True, cmap="coolwarm", cbar=False, annot=True)    
+    plot_Q_vs_cumdS_scatter(dataframes, water_year=True)
+
        
 
-#type_of_catchment = type_of_catchment[type_of_catchment.columns].astype(float)  # or int

@@ -28,23 +28,18 @@ def scatter_violin_least_squares_attribute(catch_year, least_squares, axis):
             if single_catch_year in ["23950104", "24781159", "24781206", "428832990", "42870057"]:
                 print("Skipped: " + str(single_catch_year))
                 continue
-         #   print(type(single_catch_year))
             if axis == 1:
                 least_square_single = least_squares.loc[single_catch_year,:] 
             elif axis == 0:
                 least_square_single = least_squares.loc[:,single_catch_year]
             least_square_single.name = "catchment_least_square"
-            current_catch_att = catch_year.loc[int(single_catch_year), attribute]
+            current_catch_att = catch_year.loc[ int(single_catch_year), attribute]
             # Make attribute as long as the least squares
             current_catch_att = pd.Series([current_catch_att] * len(least_square_single), index=least_square_single.index)
             current_catch_att.name=attribute
             combined = pd.concat([least_square_single, pd.Series(current_catch_att)],axis=1)
-         #   print(combined)
             collect.append(combined)
         all_data_attribute = pd.concat(collect,ignore_index=True)
-#        all_data_attribute.index = catch_year.index
-#        print(all_data_attribute)
-#        break
         
         ax = plt.gca()
         fig = plt.gcf()
@@ -52,31 +47,21 @@ def scatter_violin_least_squares_attribute(catch_year, least_squares, axis):
         if all_data_attribute[attribute].dtype != float:
             sns.violinplot(y="catchment_least_square", data=all_data_attribute, x=attribute,ax=ax)
             pairs = find_unique_pairs(all_data_attribute[attribute])
-            print(pairs)
             statannot.add_stat_annotation(ax, data=all_data_attribute, x=attribute,y="catchment_least_square",
                                           box_pairs=pairs)
-        #    print(all_data_attribute[attribute])
             ax.set_title(attribute)
 
         else:
             x = all_data_attribute[attribute].astype(float)
-#            if x is None:
-#                continue
-           # print(x)
             y = all_data_attribute["catchment_least_square"]
             xy = pd.concat([x,y],axis=1)
             xy.dropna(inplace=True)
-            #print(y)
             results = scipy.stats.linregress(xy)           
             ax = sns.regplot(x,y, marker="o",
                         scatter_kws={"s":0.2, "facecolor":"blue", "edgecolor":None},
                         line_kws={"color":"black", "linewidth":"0.75"})
             bonferoni_p_val_correction = 22
             ax.set_title(attribute+ " pval: " +str(round(results[3]*bonferoni_p_val_correction,5)))
-#            fit = np.polyfit(x,y , deg=2)
-#            func = np.poly1d(fit)
-#            y_sim = func(x)
-#            ax.plot(x,y_sim, color="red")
             
         
         ax.set_xlabel(attribute)
@@ -109,7 +94,6 @@ def heatmap_ls(least_squares):
     ax = sns.heatmap(ls, square=True, cmap="PuBu")
     ax.hlines(1, *ax.get_xlim(), color="white", linewidth=1)
     ax.vlines(ls.shape[1]-1, *ax.get_ylim(), color="white", linewidth=1)
-    print(ls)
     
 
 
@@ -120,5 +104,5 @@ if __name__ == "__main__":
    least_squares = pd.read_csv("least_square_all_catchments.csv", sep=";", index_col=0)
    del(least_squares["41510205"])
    heatmap_ls(least_squares)
-   #scatter_violin_least_squares_attribute(catchments, least_squares, 0)
-   #scatter_violin_least_squares_attribute(years, least_squares, 1)
+   scatter_violin_least_squares_attribute(catchments, least_squares, 0)
+   scatter_violin_least_squares_attribute(years, least_squares, 1)
