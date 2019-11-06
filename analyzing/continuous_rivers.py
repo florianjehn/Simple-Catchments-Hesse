@@ -60,7 +60,7 @@ def scatter_violin_least_squares_attribute(catch_year, least_squares, axis):
             ax = sns.regplot(x,y, marker="o",
                         scatter_kws={"s":0.2, "facecolor":"blue", "edgecolor":None},
                         line_kws={"color":"black", "linewidth":"0.75"})
-            bonferoni_p_val_correction = 22
+            bonferoni_p_val_correction = 23
             ax.set_title(attribute+ " pval: " +str(round(results[3]*bonferoni_p_val_correction,5)))
             
         
@@ -95,6 +95,21 @@ def heatmap_ls(least_squares):
     ax.hlines(1, *ax.get_xlim(), color="white", linewidth=1)
     ax.vlines(ls.shape[1]-1, *ax.get_ylim(), color="white", linewidth=1)
     
+    
+def regplot_kge_lse(lse, kge):
+    """
+    Creates a regplot for all values of the least squares and the KGE for 
+    all catchments and all years. 
+    """
+    new = pd.DataFrame(columns = ["kge", "lse"], index=list(range(2430)))
+    new["kge"] = pd.concat([kge[col] for col in kge]).reset_index(drop=True)
+    new["lse"] = pd.concat([lse[col] for col in lse]).reset_index(drop=True)
+    ax = sns.regplot(y="kge", x="lse", data=new,marker="o",
+                        scatter_kws={"s":0.5, "facecolor":"blue", "edgecolor":None},
+                        line_kws={"color":"black", "linewidth":"0.75"})
+    results = scipy.stats.linregress(new.dropna())
+    ax.set_title("pval: " +str(round(results[3]*23,5)))
+    plt.savefig("kge_lse.png", dpi=200)
 
 
 if __name__ == "__main__":
@@ -103,6 +118,8 @@ if __name__ == "__main__":
    years = ccdt.get_attributes_years()
    least_squares = pd.read_csv("least_square_all_catchments.csv", sep=";", index_col=0)
    del(least_squares["41510205"])
-   heatmap_ls(least_squares)
-   scatter_violin_least_squares_attribute(catchments, least_squares, 0)
-   scatter_violin_least_squares_attribute(years, least_squares, 1)
+#   heatmap_ls(least_squares)
+#   scatter_violin_least_squares_attribute(catchments, least_squares, 0)
+#   scatter_violin_least_squares_attribute(years, least_squares, 1)
+   kge = pd.read_csv("kge_all_years_catch.csv", sep=";", index_col=0)
+   regplot_kge_lse(least_squares, kge)
