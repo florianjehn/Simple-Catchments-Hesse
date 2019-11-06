@@ -23,19 +23,15 @@ def go_through_all_catch_years(dataframes):
     kge_all_years_catch = pd.DataFrame(index=range(1992, 2019), columns = list(dataframes.keys()))
     for catch in dataframes.keys():
         for year, year_df in dataframes[catch].groupby("water_year"):
-            if year_df.isnull().values.any():
-                # Skip years with empty values
+            if year_df.isnull().values.any() or year==1991 or year==2019:
+                # Skip years with empty values or uncomplete
                 continue
             mymodel= spot_setup(year_df.E, year_df.P, year_df.Q)
             sampler = spotpy.algorithms.lhs(mymodel,dbname="bla", dbformat="ram")
             sampler.sample(500)
             best = max(sampler.getdata()["like1"])
             kge_all_years_catch.loc[year, catch] = best
-    kge_all_years_catch.to_csv("kge_all_years_catch.csv", sep=";")
-            
-
-            
-            
+    kge_all_years_catch.to_csv("kge_all_years_catch.csv", sep=";")     
 
 
 class spot_setup(object):
@@ -63,5 +59,5 @@ class spot_setup(object):
 if __name__ == "__main__":
    import preprocessing.cleaned_data.create_cleaned_data_table as ccdt
    dataframes = ccdt.get_table_dict(calc_water_year=True, et_corrected=True)
-   dataframes = {k: dataframes[k] for k in list(dataframes.keys())[:2]}
+ #  dataframes = {k: dataframes[k] for k in list(dataframes.keys())[:2]}
    go_through_all_catch_years(dataframes)
