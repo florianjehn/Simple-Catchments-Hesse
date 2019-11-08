@@ -43,13 +43,13 @@ def scatter_violin_least_squares_attribute(catch_year, least_squares, axis):
         
         ax = plt.gca()
         fig = plt.gcf()
-
+        looking_at = "year" if axis == 1 else "catchment"
         if all_data_attribute[attribute].dtype != float:
             sns.violinplot(y="catchment_least_square", data=all_data_attribute, x=attribute,ax=ax)
-            pairs = find_unique_pairs(all_data_attribute[attribute])
-            statannot.add_stat_annotation(ax, data=all_data_attribute, x=attribute,y="catchment_least_square",
-                                          box_pairs=pairs)
-            ax.set_title(attribute)
+#            pairs = find_unique_pairs(all_data_attribute[attribute])
+#            statannot.add_stat_annotation(ax, data=all_data_attribute, x=attribute,y="catchment_least_square",
+#                                          box_pairs=pairs)
+            ax.set_title(looking_at + ": " + attribute)
 
         else:
             x = all_data_attribute[attribute].astype(float)
@@ -61,7 +61,7 @@ def scatter_violin_least_squares_attribute(catch_year, least_squares, axis):
                         scatter_kws={"s":0.2, "facecolor":"blue", "edgecolor":None},
                         line_kws={"color":"black", "linewidth":"0.75"})
             bonferoni_p_val_correction = 23
-            ax.set_title(attribute+ " pval: " +str(round(results[3]*bonferoni_p_val_correction,5)))
+            ax.set_title(looking_at + ": " + attribute + " pval: " +str(round(results[3]*bonferoni_p_val_correction,5)))
             
         
         ax.set_xlabel(attribute)
@@ -85,15 +85,20 @@ def find_unique_pairs(cats):
 
 
 def heatmap_ls(least_squares):
-    ls = least_squares.copy()
-    ls["year_avg"] = ls.mean(axis=1)
-    catch_avg = pd.DataFrame(ls.mean()).transpose()
-    catch_avg.index = ["catch_avg"]
-    ls = pd.concat([catch_avg, ls])
-    ls.loc["catch_avg", "year_avg"] = None
-    ax = sns.heatmap(ls, square=True, cmap="PuBu")
-    ax.hlines(1, *ax.get_xlim(), color="white", linewidth=1)
-    ax.vlines(ls.shape[1]-1, *ax.get_ylim(), color="white", linewidth=1)
+    ls = least_squares.copy().transpose()
+    print(ls)
+    ls["catch_avg"] = ls.mean(axis=1)
+    year_avg = pd.DataFrame(ls.mean()).transpose()
+    year_avg.index = ["year_avg"]
+    ls = pd.concat([year_avg, ls])
+    ls.loc[ "year_avg", "catch_avg"] = None
+    ax = sns.heatmap(ls, square=True, cmap="PuBu", yticklabels=False, xticklabels=1)
+    ax.hlines(1, *ax.get_xlim(), color="black", linewidth=1)
+    ax.vlines(ls.shape[1]-1, *ax.get_ylim(), color="black", linewidth=1)
+    fig = plt.gcf()
+    fig.set_size_inches(20,20)
+    plt.savefig("heatmap_lse.png", dpi=200, bbox_inches="tight")
+    plt.close()
     
     
 def regplot_kge_lse(lse, kge):
@@ -110,6 +115,7 @@ def regplot_kge_lse(lse, kge):
     results = scipy.stats.linregress(new.dropna())
     ax.set_title("pval: " +str(round(results[3]*23,5)))
     plt.savefig("kge_lse.png", dpi=200)
+    plt.close()
 
 
 if __name__ == "__main__":
@@ -118,8 +124,8 @@ if __name__ == "__main__":
    years = ccdt.get_attributes_years()
    least_squares = pd.read_csv("least_square_all_catchments.csv", sep=";", index_col=0)
    del(least_squares["41510205"])
-#   heatmap_ls(least_squares)
+   heatmap_ls(least_squares)
 #   scatter_violin_least_squares_attribute(catchments, least_squares, 0)
 #   scatter_violin_least_squares_attribute(years, least_squares, 1)
-   kge = pd.read_csv("kge_all_years_catch.csv", sep=";", index_col=0)
-   regplot_kge_lse(least_squares, kge)
+#   kge = pd.read_csv("kge_all_years_catch.csv", sep=";", index_col=0)
+#   regplot_kge_lse(least_squares, kge)

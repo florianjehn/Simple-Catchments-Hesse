@@ -32,6 +32,21 @@ def go_through_all_catch_years(dataframes):
             best = max(sampler.getdata()["like1"])
             kge_all_years_catch.loc[year, catch] = best
     kge_all_years_catch.to_csv("kge_all_years_catch.csv", sep=";")     
+    
+    
+#def go_through_all_catchments(dataframes):
+#    """
+#    Cycles through all catchments (but uses all years) seperately and saves the KGE to
+#    a new dataframes (and then a csv)
+#    """
+#    kge_all_catchments = pd.DataFrame(list(dataframes.keys()), columns = ["kge"])
+#    for catch in dataframes.keys():
+#        mymodel= spot_setup(dataframes[catch].E, dataframes[catch].P, dataframes[catch].Q)
+#        sampler = spotpy.algorithms.lhs(mymodel,dbname="bla", dbformat="ram")
+#        sampler.sample(500)
+#        best = max(sampler.getdata()["like1"])
+#        kge_all_catchments.loc[catch, "kge"] = best
+#    kge_all_catchments.to_csv("kge_all_catchments.csv", sep=";")     
 
 
 class spot_setup(object):
@@ -53,11 +68,13 @@ class spot_setup(object):
         return self.trueObs
     
     def objectivefunction(self,simulation,evaluation, params=None):
+        
         return spotpy.objectivefunctions.kge(evaluation, simulation)
-
+    
 
 if __name__ == "__main__":
    import preprocessing.cleaned_data.create_cleaned_data_table as ccdt
    dataframes = ccdt.get_table_dict(calc_water_year=True, et_corrected=True)
  #  dataframes = {k: dataframes[k] for k in list(dataframes.keys())[:2]}
    go_through_all_catch_years(dataframes)
+  # go_through_all_catchments(dataframes)
