@@ -5,7 +5,6 @@ import os
 import sys
 import seaborn as sns
 import scipy
-import statannot
 # add the whole package to the path
 file_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.sep.join(file_dir.split(os.sep)[:-1]))
@@ -19,6 +18,7 @@ def scatter_violin_least_squares_attribute(catch_year, least_squares, axis):
     axis = 1 --> rows/years
         """
     for attribute in catch_year.columns:
+        print(attribute)
         if attribute == "gauge":
             continue
         iterate = least_squares.index if axis == 1 else least_squares.columns
@@ -44,12 +44,19 @@ def scatter_violin_least_squares_attribute(catch_year, least_squares, axis):
         ax = plt.gca()
         fig = plt.gcf()
         looking_at = "year" if axis == 1 else "catchment"
+        bonferoni_p_val_correction = 24
+
         if all_data_attribute[attribute].dtype != float:
             sns.violinplot(y="catchment_least_square", data=all_data_attribute, x=attribute,ax=ax)
-#            pairs = find_unique_pairs(all_data_attribute[attribute])
-#            statannot.add_stat_annotation(ax, data=all_data_attribute, x=attribute,y="catchment_least_square",
-#                                          box_pairs=pairs)
-            ax.set_title(looking_at + ": " + attribute)
+         #   print(all_data_attribute)
+            values_per_group = [col.dropna() for col_name, col in all_data_attribute.groupby(attribute)["catchment_least_square"]]
+#            for key, val in values_per_group.items():
+#                print(key)
+#                print(val)
+            statistic, pval = scipy.stats.f_oneway(*values_per_group)
+            
+
+            ax.set_title(looking_at + ": " + attribute + " pval: " + str(round(pval*bonferoni_p_val_correction,5)))
 
         else:
             x = all_data_attribute[attribute].astype(float)
@@ -60,7 +67,6 @@ def scatter_violin_least_squares_attribute(catch_year, least_squares, axis):
             ax = sns.regplot(x,y, marker="o",
                         scatter_kws={"s":0.2, "facecolor":"blue", "edgecolor":None},
                         line_kws={"color":"black", "linewidth":"0.75"})
-            bonferoni_p_val_correction = 23
             ax.set_title(looking_at + ": " + attribute + " pval: " +str(round(results[3]*bonferoni_p_val_correction,5)))
             
         
@@ -86,7 +92,6 @@ def find_unique_pairs(cats):
 
 def heatmap_ls(least_squares):
     ls = least_squares.copy().transpose()
-    print(ls)
     ls["catch_avg"] = ls.mean(axis=1)
     year_avg = pd.DataFrame(ls.mean()).transpose()
     year_avg.index = ["year_avg"]
@@ -125,7 +130,7 @@ if __name__ == "__main__":
    least_squares = pd.read_csv("least_square_all_catchments.csv", sep=";", index_col=0)
    del(least_squares["41510205"])
    heatmap_ls(least_squares)
-#   scatter_violin_least_squares_attribute(catchments, least_squares, 0)
-#   scatter_violin_least_squares_attribute(years, least_squares, 1)
-#   kge = pd.read_csv("kge_all_years_catch.csv", sep=";", index_col=0)
-#   regplot_kge_lse(least_squares, kge)
+   scatter_violin_least_squares_attribute(catchments, least_squares, 0)
+   scatter_violin_least_squares_attribute(years, least_squares, 1)
+   kge = pd.read_csv("kge_all_years_catch.csv", sep=";", index_col=0)
+   regplot_kge_lse(least_squares, kge)
