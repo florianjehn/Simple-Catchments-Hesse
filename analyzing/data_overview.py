@@ -23,48 +23,50 @@ def overview_plot(catchments, years):
     Plots all catchment and year attributes in one big figure to give an 
     overview of all catchments
     """
-    fig = plt.figure(figsize=(10,40))
-    outer = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[16,9], hspace=0.5)
+    fig = plt.figure(figsize=(20,30))
+    outer = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[16,9], hspace=0.15)
     
-    catchments_grid = gridspec.GridSpecFromSubplotSpec(4,4, subplot_spec=outer[0], wspace=0.5, hspace=1)
+    catchments_grid = gridspec.GridSpecFromSubplotSpec(4,4, subplot_spec=outer[0], wspace=0.2, hspace=0.45)
     
-    years_grid = gridspec.GridSpecFromSubplotSpec(2,4, subplot_spec=outer[1], wspace=0.5, hspace=1)
+    years_grid = gridspec.GridSpecFromSubplotSpec(2,4, subplot_spec=outer[1], wspace=0.2, hspace=0.2)
     
     for i, attribute in enumerate(catchments.columns):
         current_att = catchments[attribute]
         ax = plt.Subplot(fig, catchments_grid[i])
         if current_att.dtypes != float:
             current_att = catchments.groupby(attribute)[attribute].count()
+            if attribute == "Permeability [/]":
+                current_att.reindex(["very low", "low/very low", "low",
+                                     "moderate/low", "moderate", "mid/moderate",
+                                     "mid", "variable"]).plot.bar(ax=ax, color="lightgrey")
 
-            print(current_att)
-            current_att.plot.bar(ax=ax, stacked=True)
+            else:
+                current_att.plot.bar(ax=ax, color="lightgrey")
             for tick in ax.get_xticklabels():
-                tick.set_rotation(45)
+                tick.set_rotation(50)
+            ax.set_xlabel("")
+            ax.set_ylabel("Frequency")
         else:
-            current_att.plot.hist(ax=ax,histtype ="step", bins=15)
+            current_att.plot.hist(ax=ax, rwidth=0.9, color="lightgrey")
         ax.set_title(attribute)
         fig.add_subplot(ax)
 
         
     for j, attribute in enumerate(years.columns):
         ax = plt.Subplot(fig, years_grid[j])
-        years[attribute].plot.hist(ax=ax,histtype ="step", bins=15)
+        years[attribute].plot.hist(ax=ax, rwidth=0.9, color="lightgrey")
         ax.set_title(attribute)
 
         fig.add_subplot(ax)
-        
-   # fig.tight_layout()
-    fig.suptitle("\n\n\nCatchment Attributes\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nYear Attributes", 
-                 horizontalalignment='center', color="red")
 
-    fig.show()
+    plt.savefig("overview.png", dpi=100, bbox_inches="tight")
+    plt.close()
     
     
 
 if __name__ == "__main__":
    import preprocessing.cleaned_data.create_cleaned_data_table as ccdt
-   catchments = ccdt.get_attributes_catchments_num()
-   catchments.drop("gauge", axis=1, inplace=True)
+   catchments = ccdt.get_attributes_catchments()
 
    years = ccdt.get_attributes_years()
    years.drop(['soil_temp_C_1991_2018', 'mean_air_temperature'], axis=1, inplace=True)
