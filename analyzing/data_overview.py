@@ -30,6 +30,7 @@ def overview_plot(catchments, years):
     
     years_grid = gridspec.GridSpecFromSubplotSpec(2,4, subplot_spec=outer[1], wspace=0.2, hspace=0.2)
     
+    axes = []
     for i, attribute in enumerate(catchments.columns):
         current_att = catchments[attribute]
         ax = plt.Subplot(fig, catchments_grid[i])
@@ -38,26 +39,38 @@ def overview_plot(catchments, years):
             if attribute == "Permeability [/]":
                 current_att.reindex(["very low", "low/very low", "low",
                                      "moderate/low", "moderate", "mid/moderate",
-                                     "mid", "variable"]).plot.bar(ax=ax, color="lightgrey")
+                                     "mid", "variable"]).plot.bar(ax=ax, color="lightsteelblue",zorder=5)
 
             else:
-                current_att.plot.bar(ax=ax, color="lightgrey")
+                current_att.plot.bar(ax=ax, color="lightsteelblue",zorder=5)
             for tick in ax.get_xticklabels():
                 tick.set_rotation(50)
             ax.set_xlabel("")
             ax.set_ylabel("Frequency")
         else:
-            current_att.plot.hist(ax=ax, rwidth=0.9, color="lightgrey")
-        ax.set_title(attribute)
+            current_att.plot.hist(ax=ax, color="lightsteelblue",zorder=5)
+        ax.set_xlabel(attribute, alpha=0.7)
         fig.add_subplot(ax)
+        axes.append(ax)
 
         
     for j, attribute in enumerate(years.columns):
         ax = plt.Subplot(fig, years_grid[j])
-        years[attribute].plot.hist(ax=ax, rwidth=0.9, color="lightgrey")
-        ax.set_title(attribute)
+        years[attribute].plot.hist(ax=ax,  color="lightsteelblue",zorder=5)
+        ax.set_xlabel(attribute, alpha=0.7)
 
         fig.add_subplot(ax)
+        axes.append(ax)
+    
+    for ax in axes:
+        # Make it nice
+        plt.setp(ax.get_yticklabels(), alpha=0.7)
+        plt.setp(ax.get_xticklabels(), alpha=0.7)
+        ax.tick_params(axis=u'both', which=u'both',length=0)
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+        ax.yaxis.grid(True, color="lightgrey",zorder=0)
+        ax.set_ylabel(ax.get_ylabel(), alpha=0.7)
 
     plt.savefig("overview.png", dpi=100, bbox_inches="tight")
     plt.close()
