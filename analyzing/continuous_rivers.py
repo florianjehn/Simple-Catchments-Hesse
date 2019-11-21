@@ -5,6 +5,7 @@ import os
 import sys
 import seaborn as sns
 import scipy
+from matplotlib.gridspec import GridSpec
 # add the whole package to the path
 file_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.sep.join(file_dir.split(os.sep)[:-1]))
@@ -91,15 +92,43 @@ def find_unique_pairs(cats):
 
 
 def heatmap_ls(least_squares):
-    ls = least_squares.copy().transpose()
-    ls["catch_avg"] = ls.mean(axis=1)
-    year_avg = pd.DataFrame(ls.mean()).transpose()
-    year_avg.index = ["year_avg"]
-    ls = pd.concat([year_avg, ls])
-    ls.loc[ "year_avg", "catch_avg"] = None
-    ax = sns.heatmap(ls, square=True, cmap="PuBu", yticklabels=False, xticklabels=1)
-    ax.hlines(1, *ax.get_xlim(), color="black", linewidth=1)
-    ax.vlines(ls.shape[1]-1, *ax.get_ylim(), color="black", linewidth=1)
+    """Creats a heatmap of the least squares with bar plots on each
+    side to mark the mean """
+    # Create the gridspec
+    gs = GridSpec(2,2, height_ratios=[1,3], width_ratios = [20, 1], hspace=0, wspace=-1.48)
+    fig = plt.gcf()
+    # Plot the heatmap
+    ax_heatmap = fig.add_subplot(gs[1,0])
+    ls = least_squares.copy()
+    ls = ls.reindex(ls.mean().sort_values().index,axis=1)
+    ls = ls.transpose()
+
+    sns.heatmap(ls, square=True, cmap="PuBu", yticklabels=False, xticklabels=1, 
+                     cbar_kws = dict(use_gridspec=False,location="left",shrink= 0.4, pad=0.01), 
+                     ax=ax_heatmap)
+    # Calculate the averages for the bar plots
+    catchment_avg = ls.mean(axis=1).sort_values(ascending =False)
+    year_avg = pd.DataFrame(ls.mean())
+
+    # Plot the barplots
+    # Dummy plot
+    ax_bar_top = fig.add_subplot(gs[0,0])
+    year_avg.plot.bar(ax=ax_bar_top, color="lightsteelblue")
+    ax_bar_top.get_legend().remove()
+    ax_bar_right = fig.add_subplot(gs[1,1])
+    catchment_avg.plot.barh(ax=ax_bar_right, color="lightsteelblue")
+    # Remove all borders and stuff
+    for ax in [ax_bar_top, ax_bar_right]:
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+            plt.setp(ax.get_yticklabels(), alpha=0)
+            plt.setp(ax.get_xticklabels(), alpha=0)
+            ax.tick_params(axis=u'both', which=u'both',length=0)
+            
+    # Adjust top plot finely grained
+    
+    ax_bar_top.set_position([0.58,0.69, 0.175, 0.1])
+    # Finishing touches    
     fig = plt.gcf()
     fig.set_size_inches(20,20)
     plt.savefig("heatmap_lse.png", dpi=200, bbox_inches="tight")
@@ -125,12 +154,12 @@ def regplot_kge_lse(lse, kge):
 
 if __name__ == "__main__":
    import preprocessing.cleaned_data.create_cleaned_data_table as ccdt
-   catchments = ccdt.get_attributes_catchments_num()
+   catchments = ccdt.get_attributes_catchments()
    years = ccdt.get_attributes_years()
    least_squares = pd.read_csv("least_square_all_catchments.csv", sep=";", index_col=0)
    del(least_squares["41510205"])
    heatmap_ls(least_squares)
-   scatter_violin_least_squares_attribute(catchments, least_squares, 0)
-   scatter_violin_least_squares_attribute(years, least_squares, 1)
-   kge = pd.read_csv("kge_all_years_catch.csv", sep=";", index_col=0)
-   regplot_kge_lse(least_squares, kge)
+  # scatter_violin_least_squares_attribute(catchments, least_squares, 0)
+  # scatter_violin_least_squares_attribute(years, least_squares, 1)
+  # kge = pd.read_csv("kge_all_years_catch.csv", sep=";", index_col=0)
+  # regplot_kge_lse(least_squares, kge)
