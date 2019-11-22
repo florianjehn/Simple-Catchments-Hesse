@@ -39,16 +39,22 @@ def overview_plot(catchments, years):
             if attribute == "Permeability [/]":
                 current_att.reindex(["very low", "low/very low", "low",
                                      "moderate/low", "moderate", "mid/moderate",
-                                     "mid", "variable"]).plot.bar(ax=ax, color="lightsteelblue",zorder=5)
+                                     "mid", "variable"]).plot.bar(ax=ax, 
+                                        facecolor="lightsteelblue", 
+                                        edgecolor="grey", linewidth=1,
+                                        zorder=5)
 
             else:
-                current_att.plot.bar(ax=ax, color="lightsteelblue",zorder=5)
+                current_att.plot.bar(ax=ax,facecolor="lightsteelblue", 
+                                        edgecolor="grey", linewidth=1,zorder=5)
             for tick in ax.get_xticklabels():
                 tick.set_rotation(50)
             ax.set_xlabel("")
             ax.set_ylabel("Frequency")
         else:
-            current_att.plot.hist(ax=ax, color="lightsteelblue",zorder=5)
+            current_att.plot.hist(ax=ax,zorder=5,
+                                  facecolor="lightsteelblue", 
+                                        edgecolor="grey", linewidth=1,)
         ax.set_xlabel(attribute, alpha=0.7)
         fig.add_subplot(ax)
         axes.append(ax)
@@ -56,7 +62,8 @@ def overview_plot(catchments, years):
         
     for j, attribute in enumerate(years.columns):
         ax = plt.Subplot(fig, years_grid[j])
-        years[attribute].plot.hist(ax=ax,  color="lightsteelblue",zorder=5)
+        years[attribute].plot.hist(ax=ax,  zorder=5,facecolor="lightsteelblue", 
+                                        edgecolor="grey", linewidth=1)
         ax.set_xlabel(attribute, alpha=0.7)
 
         fig.add_subplot(ax)

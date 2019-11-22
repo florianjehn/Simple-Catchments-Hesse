@@ -22,6 +22,8 @@ def scatter_violin_least_squares_attribute(catch_year, least_squares, axis):
         print(attribute)
         if attribute == "gauge":
             continue
+        if "temp" in attribute:
+            continue
         iterate = least_squares.index if axis == 1 else least_squares.columns
         collect = []
         for single_catch_year in iterate:
@@ -44,20 +46,21 @@ def scatter_violin_least_squares_attribute(catch_year, least_squares, axis):
         
         ax = plt.gca()
         fig = plt.gcf()
-        looking_at = "year" if axis == 1 else "catchment"
+        looking_at = "Year Attribute" if axis == 1 else "Catchment Attribute"
         bonferoni_p_val_correction = 24
 
         if all_data_attribute[attribute].dtype != float:
-            sns.violinplot(y="catchment_least_square", data=all_data_attribute, x=attribute,ax=ax)
+            sns.violinplot(y="catchment_least_square", data=all_data_attribute, x=attribute,ax=ax, color="lightsteelblue", zorder=5)
          #   print(all_data_attribute)
             values_per_group = [col.dropna() for col_name, col in all_data_attribute.groupby(attribute)["catchment_least_square"]]
 #            for key, val in values_per_group.items():
 #                print(key)
 #                print(val)
             statistic, pval = scipy.stats.f_oneway(*values_per_group)
-            
+            for tick in ax.get_xticklabels():
+                tick.set_rotation(50)
 
-            ax.set_title(looking_at + ": " + attribute + " pval: " + str(round(pval*bonferoni_p_val_correction,5)))
+            ax.set_title(looking_at + ": " + attribute + " pval: " + str(round(pval*bonferoni_p_val_correction,3)),alpha=0.7)
 
         else:
             x = all_data_attribute[attribute].astype(float)
@@ -66,15 +69,23 @@ def scatter_violin_least_squares_attribute(catch_year, least_squares, axis):
             xy.dropna(inplace=True)
             results = scipy.stats.linregress(xy)           
             ax = sns.regplot(x,y, marker="o",
-                        scatter_kws={"s":0.2, "facecolor":"blue", "edgecolor":None},
+                        scatter_kws={"s":0.2, "facecolor":"lightsteelblue", "edgecolor":None},
                         line_kws={"color":"black", "linewidth":"0.75"})
-            ax.set_title(looking_at + ": " + attribute + " pval: " +str(round(results[3]*bonferoni_p_val_correction,5)))
-            
+            ax.set_title(looking_at + ": " + attribute + " pval: " +str(round(results[3]*bonferoni_p_val_correction,3)),
+                         alpha=0.7)
+            ax.grid(True, color="lightgrey",zorder=0)
+
+        ax.set_ylabel("Mean Least Square Error [/]",alpha=.7) 
+        # Make nicer
+        plt.setp(ax.get_yticklabels(), alpha=0.7)
+        plt.setp(ax.get_xticklabels(), alpha=0.7)
+        ax.tick_params(axis=u'both', which=u'both',length=0)
+        for spine in ax.spines.values():
+            spine.set_visible(False)
         
-        ax.set_xlabel(attribute)
-        ax.set_ylabel("least square error")
+        ax.set_xlabel(attribute, alpha=0.7)
         fig.tight_layout()
-        plt.savefig(attribute + ".png", dpi=200)
+        plt.savefig(looking_at + attribute[:-4] + ".png", dpi=200)
         plt.close()
         
         
@@ -95,7 +106,7 @@ def heatmap_ls(least_squares):
     """Creats a heatmap of the least squares with bar plots on each
     side to mark the mean """
     # Create the gridspec
-    gs = GridSpec(2,2, height_ratios=[1,3], width_ratios = [20, 1], hspace=0, wspace=-1.48)
+    gs = GridSpec(2,2, height_ratios=[1,3], width_ratios = [30, 1], hspace=0, wspace=-1.513)
     fig = plt.gcf()
     # Plot the heatmap
     ax_heatmap = fig.add_subplot(gs[1,0])
@@ -104,8 +115,18 @@ def heatmap_ls(least_squares):
     ls = ls.transpose()
 
     sns.heatmap(ls, square=True, cmap="PuBu", yticklabels=False, xticklabels=1, 
-                     cbar_kws = dict(use_gridspec=False,location="left",shrink= 0.4, pad=0.01), 
+                     cbar_kws = dict(use_gridspec=False,location="left",shrink= 0.3, pad=0.01), 
                      ax=ax_heatmap)
+    ax_heatmap.set_ylabel("Catchments", alpha=0.7)
+    ax_heatmap.set_xlabel("Years", alpha=0.7)
+    ax_heatmap.tick_params(axis=u'both', which=u'both',length=0)
+    plt.setp(ax_heatmap.get_xticklabels(), alpha=0.7)
+    
+    cbar = ax_heatmap.collections[0].colorbar
+    # here set the labelsize by 20
+    cbar.ax.set_ylabel("Mean Least Square Error [/]", alpha=0.7)
+    plt.setp(cbar.ax.get_yticklabels(), alpha=0.7)
+    cbar.ax.tick_params(color="lightgrey")
     # Calculate the averages for the bar plots
     catchment_avg = ls.mean(axis=1).sort_values(ascending =False)
     year_avg = pd.DataFrame(ls.mean())
@@ -113,10 +134,10 @@ def heatmap_ls(least_squares):
     # Plot the barplots
     # Dummy plot
     ax_bar_top = fig.add_subplot(gs[0,0])
-    year_avg.plot.bar(ax=ax_bar_top, color="lightsteelblue")
+    year_avg.plot.bar(ax=ax_bar_top, color="lightsteelblue", zorder=5)
     ax_bar_top.get_legend().remove()
     ax_bar_right = fig.add_subplot(gs[1,1])
-    catchment_avg.plot.barh(ax=ax_bar_right, color="lightsteelblue")
+    catchment_avg.plot.barh(ax=ax_bar_right, color="lightsteelblue", zorder=5)
     # Remove all borders and stuff
     for ax in [ax_bar_top, ax_bar_right]:
         for spine in ax.spines.values():
@@ -124,10 +145,22 @@ def heatmap_ls(least_squares):
             plt.setp(ax.get_yticklabels(), alpha=0)
             plt.setp(ax.get_xticklabels(), alpha=0)
             ax.tick_params(axis=u'both', which=u'both',length=0)
-            
+   
+    ax_bar_top.yaxis.grid(True, color="lightgrey",zorder=0)
+    ax_bar_right.xaxis.grid(True, color="lightgrey",zorder=0)
+    plt.setp(ax_bar_top.get_yticklabels(), alpha=0.7)
+    plt.setp(ax_bar_top.get_xticklabels(), alpha=0)
+    plt.setp(ax_bar_right.get_yticklabels(), alpha=0)
+    plt.setp(ax_bar_right.get_xticklabels(), alpha=0.7) 
+
+    ax_bar_top.set_title("Yearly Mean of the Mean Least Square Error [/]", alpha=0.7)      
+    ax_bar_right.set_ylabel("Catchment Mean of the Mean Least Square Error [/]", alpha=0.7, labelpad=-200, rotation=270)
+
+    for tick in ax_bar_right.get_xticklabels():
+        tick.set_rotation(90)     
     # Adjust top plot finely grained
     
-    ax_bar_top.set_position([0.58,0.69, 0.175, 0.1])
+    ax_bar_top.set_position([0.618,0.69, 0.175, 0.1])
     # Finishing touches    
     fig = plt.gcf()
     fig.set_size_inches(20,20)
@@ -144,10 +177,19 @@ def regplot_kge_lse(lse, kge):
     new["kge"] = pd.concat([kge[col] for col in kge]).reset_index(drop=True)
     new["lse"] = pd.concat([lse[col] for col in lse]).reset_index(drop=True)
     ax = sns.regplot(y="kge", x="lse", data=new,marker="o",
-                        scatter_kws={"s":0.5, "facecolor":"blue", "edgecolor":None},
-                        line_kws={"color":"black", "linewidth":"0.75"})
+                        scatter_kws={"s":0.5, "facecolor":"lightsteelblue", "edgecolor":None, "zorder":5},
+                        line_kws={"color":"black", "linewidth":"0.75", "zorder":6})
     results = scipy.stats.linregress(new.dropna())
-    ax.set_title("pval: " +str(round(results[3]*23,5)))
+    ax.set_title("Relationship Model Efficieny and Catchment Complexity, pval: " +str(round(results[3]*23,3)), alpha=0.7)
+    ax.set_xlabel("Mean Least Square Error [/]", alpha=0.7)
+    ax.set_ylabel("Kling Gupta Efficienty [/]", alpha=0.7)
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+    ax.tick_params(axis=u'both', which=u'both',length=0)
+
+    ax.grid(True, color="lightgrey", zorder=0)
+    plt.setp(ax.get_yticklabels(), alpha=0.7)
+    plt.setp(ax.get_xticklabels(), alpha=0.7)
     plt.savefig("kge_lse.png", dpi=200)
     plt.close()
 
@@ -155,11 +197,12 @@ def regplot_kge_lse(lse, kge):
 if __name__ == "__main__":
    import preprocessing.cleaned_data.create_cleaned_data_table as ccdt
    catchments = ccdt.get_attributes_catchments()
+   
    years = ccdt.get_attributes_years()
    least_squares = pd.read_csv("least_square_all_catchments.csv", sep=";", index_col=0)
    del(least_squares["41510205"])
-   heatmap_ls(least_squares)
-  # scatter_violin_least_squares_attribute(catchments, least_squares, 0)
-  # scatter_violin_least_squares_attribute(years, least_squares, 1)
-  # kge = pd.read_csv("kge_all_years_catch.csv", sep=";", index_col=0)
-  # regplot_kge_lse(least_squares, kge)
+  # heatmap_ls(least_squares)
+#   scatter_violin_least_squares_attribute(catchments, least_squares, 0)
+#   scatter_violin_least_squares_attribute(years, least_squares, 1)
+   kge = pd.read_csv("kge_all_years_catch.csv", sep=";", index_col=0)
+   regplot_kge_lse(least_squares, kge)
