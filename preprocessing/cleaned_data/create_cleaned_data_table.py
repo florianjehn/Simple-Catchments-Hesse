@@ -92,7 +92,7 @@ def translate_catchment_attributes(attributes):
             'Lehmsande (ls)': "loamy sand", 
             'Tonschluffe (tu)':"clay silt", 
             'Sandlehme (sl)': "sandy loam",       
-            'Schlufftone (ut)': "sitly clay", 
+            'Schlufftone (ut)': "silty clay", 
             'Lehmschluffe (lu)': "loamy silt"},inplace=True)
     attributes["Permeability [/]"].replace({
             'gering (>1E-7 - 1E-5)': "low", 

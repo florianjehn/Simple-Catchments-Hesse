@@ -18,7 +18,107 @@ import matplotlib
 file_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.sep.join(file_dir.split(os.sep)[:-1]))
 
+def plot_differences_catchments_years_by_least_squares_only_catchments(catchments, least_squares, amount_homogen):           
+    """
+    Plots the attributes of the catchments seperated by the most complex and most simple catchments
+        """
+    fig = plt.figure(figsize=(15,22.5))
+    outer = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[1,1], hspace=0.15)
+    
+    cat_grid = gridspec.GridSpecFromSubplotSpec(2,3, subplot_spec=outer[0], wspace=0.5, hspace=0.15)
+    
+    num_grid= gridspec.GridSpecFromSubplotSpec(2,3, subplot_spec=outer[1], wspace=0.2, hspace=0.15)
+    axes = []
 
+    # Get the predominant type for every year/catchment
+    mean_least_squares = least_squares.mean(axis=0)
+        
+    # Find the year/catchment that have the highest and lowest least square error
+    simple_catch_year = mean_least_squares[mean_least_squares < mean_least_squares.quantile(amount_homogen)].index.astype(float)
+    complex_catch_year = mean_least_squares[mean_least_squares > mean_least_squares.quantile(1-amount_homogen)].index.astype(float)
+    most_homogen = {"simple (n=18)": simple_catch_year, "complex (n=18)":complex_catch_year}
+        
+    # Create a figure for every attribute
+    i = 0
+    j = 0
+    for att in catchments.columns:
+
+        print(att)
+        attributes_for_types = {}
+        for type_catch in most_homogen.keys():
+            homogen_type = most_homogen[type_catch]
+            attributes_for_one_type = catchments.loc[homogen_type, att]
+            attributes_for_one_type.name = type_catch
+            attributes_for_one_type.reset_index(inplace=True, drop=True)
+            attributes_for_types[type_catch] = attributes_for_one_type
+     #       print(attributes_for_one_type)
+            
+        all_types = pd.concat([attributes_for_types[type_catch] for type_catch in attributes_for_types.keys()],axis=1)
+     #   print(all_types)
+
+        # if they are not flaot or int they should be categorical
+        if catchments[att].dtypes != np.float64 and catchments[att].dtypes != np.int64:
+            ax = plt.Subplot(fig, cat_grid[i]) 
+
+            all_types_by_cat = pd.concat([all_types.groupby(col).count() for col in all_types.columns],axis=1, sort=True)
+            all_types_by_cat = all_types_by_cat[all_types_by_cat.columns[::-1]]
+            cmap = matplotlib.cm.get_cmap("PuBu")
+            colors = [cmap(i / len(all_types_by_cat.transpose().columns)) for i in range(len(all_types_by_cat.transpose().columns)+1)]
+
+            all_types_by_cat = all_types_by_cat.transpose()
+            cat_for_whole_dataset = catchments[att].value_counts()
+            cat_for_whole_dataset.name = "overall (n=90)"
+            cat_for_whole_dataset = pd.DataFrame(cat_for_whole_dataset).transpose()
+            all_types_by_cat = pd.concat([all_types_by_cat, cat_for_whole_dataset], sort=True)
+            # Make it percent
+            for row in all_types_by_cat.index:#
+                all_types_by_cat.loc[row,:] = (all_types_by_cat.loc[row,:] / all_types_by_cat.loc[row,:].sum()) * 100
+            # Give them the right order
+            if att == 'Permeability [/]':
+                all_types_by_cat= all_types_by_cat.transpose().reindex(["very low", "low/very low", "low",
+                                     "moderate/low", "moderate", "mid/moderate",
+                                     "mid", "variable"]).transpose()
+            elif att == "
+            ax = all_types_by_cat.plot(kind="bar", stacked=True, ax=ax, color=colors, edgecolor="grey", zorder=5)
+            legend = ax.legend(loc=7, fontsize=7,bbox_to_anchor=(1.3, 0.5))
+            for tick in ax.get_xticklabels():
+                tick.set_rotation(360)
+            ax.set_ylabel("Relative Frequency [%]", alpha=0.7)
+            ax.set_xlabel(att, alpha=0.7)
+            i += 1
+
+            
+
+        else:
+            ax = plt.Subplot(fig, num_grid[j]) 
+            all_types = pd.concat([all_types, catchments[att]], axis=1)
+            all_types.columns = ["simple (n=18)", "complex (n=18)", "overall (n=90)"]
+
+            ax = sns.swarmplot(data=all_types, ax=ax, zorder=4, color="steelblue", size=4)
+            ax = sns.boxplot(data=all_types, showcaps=False,boxprops={'facecolor':'None', "edgecolor":"grey", "zorder":5},
+                             showfliers=False,whiskerprops={'linewidth':0,}, ax=ax, zorder=5, width=0.3)
+            ax.set_ylabel(att, alpha=0.7)
+            statistic, p_value = scipy.stats.f_oneway(all_types["simple (n=18)"].dropna(), 
+                                                      all_types["complex (n=18)"].dropna(),
+                                                      all_types["overall (n=90)"].dropna())
+            bonferoni_p_val_correction = 21
+            pval = p_value*bonferoni_p_val_correction
+            pval = 1 if pval > 1 else pval
+            ax.set_title(" ANOVA P-Value: " + str(round(pval,3)),alpha=0.7)
+            j += 1
+
+        ax.yaxis.grid(True, color="lightgrey",zorder=0)
+        axes.append(ax)
+        fig.add_subplot(ax)
+        plt.setp(ax.get_yticklabels(), alpha=0.7)
+        plt.setp(ax.get_xticklabels(), alpha=0.7, fontsize=8)
+        ax.tick_params(axis=u'both', which=u'both',length=0)
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+            
+    fig = plt.gcf()
+    plt.savefig("all_together_most_extreme_catch.png", dpi=150,  bbox_inches="tight")
+    plt.close()      
 
 def plot_differences_catchments_years_by_least_squares_all_together(catchments, years, least_squares, amount_homogen):           
     """
@@ -120,7 +220,6 @@ def plot_differences_catchments_years_by_least_squares(least_squares, attributes
         
     # Create a figure for every attribute
     for att in attributes.columns:
-        print(att)
         attributes_for_types = {}
         for type_catch in most_homogen.keys():
             homogen_type = most_homogen[type_catch]
@@ -131,8 +230,6 @@ def plot_differences_catchments_years_by_least_squares(least_squares, attributes
      #       print(attributes_for_one_type)
             
         all_types = pd.concat([attributes_for_types[type_catch] for type_catch in attributes_for_types.keys()],axis=1)
-        print(all_types)
-   #     all_types.columns = 
 
         # if they are not flaot or int they should be categorical
         if attributes[att].dtypes != np.float64 and attributes[att].dtypes != np.int64:
@@ -171,4 +268,5 @@ if __name__ == "__main__":
                'Aridity [/]'],inplace=True, axis=1)
    catchments.drop(['Land Use [/]', 'Area [km²]', 'Soil Depth [m]',
                     'Slope [/]'],inplace=True, axis=1)
-   plot_differences_catchments_years_by_least_squares_all_together(catchments, years, least_squares, 0.2)
+#   plot_differences_catchments_years_by_least_squares_all_together(catchments, years, least_squares, 0.2)
+   plot_differences_catchments_years_by_least_squares_only_catchments(catchments, least_squares, 0.2)

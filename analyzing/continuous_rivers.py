@@ -142,7 +142,7 @@ def scatter_violin_lse_all_only_catchments(catchments, least_squares):
         all_data_attribute = pd.concat(collect,ignore_index=True)
 
         fig = plt.gcf()
-        bonferoni_p_val_correction = 24
+        bonferoni_p_val_correction = 21
         if all_data_attribute[attribute].dtype != float:
             ax = plt.Subplot(fig, cat_grid[i])
             sns.violinplot(y="catchment_least_square", data=all_data_attribute, x=attribute,ax=ax, color="lightsteelblue", zorder=5)
