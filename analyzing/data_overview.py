@@ -31,6 +31,8 @@ def overview_plot(catchments, years):
     years_grid = gridspec.GridSpecFromSubplotSpec(2,4, subplot_spec=outer[1], wspace=0.2, hspace=0.2)
     
     axes = []
+    color_bars = "steelblue"
+    color_edges = "black"
     for i, attribute in enumerate(catchments.columns):
         current_att = catchments[attribute]
         ax = plt.Subplot(fig, catchments_grid[i])
@@ -40,21 +42,21 @@ def overview_plot(catchments, years):
                 current_att.reindex(["very low", "low/very low", "low",
                                      "moderate/low", "moderate", "mid/moderate",
                                      "mid", "variable"]).plot.bar(ax=ax, 
-                                        facecolor="lightsteelblue", 
-                                        edgecolor="grey", linewidth=1,
+                                        facecolor=color_bars, 
+                                        edgecolor=color_edges, linewidth=1,
                                         zorder=5)
 
             else:
-                current_att.plot.bar(ax=ax,facecolor="lightsteelblue", 
-                                        edgecolor="grey", linewidth=1,zorder=5)
+                current_att.plot.bar(ax=ax,facecolor=color_bars, 
+                                        edgecolor=color_edges, linewidth=1,zorder=5)
             for tick in ax.get_xticklabels():
                 tick.set_rotation(50)
             ax.set_xlabel("")
             ax.set_ylabel("Frequency")
         else:
             current_att.plot.hist(ax=ax,zorder=5,
-                                  facecolor="lightsteelblue", 
-                                        edgecolor="grey", linewidth=1,)
+                                  facecolor=color_bars, 
+                                        edgecolor=color_edges, linewidth=1,)
         ax.set_xlabel(attribute, alpha=0.7)
         fig.add_subplot(ax)
         axes.append(ax)
@@ -62,8 +64,8 @@ def overview_plot(catchments, years):
         
     for j, attribute in enumerate(years.columns):
         ax = plt.Subplot(fig, years_grid[j])
-        years[attribute].plot.hist(ax=ax,  zorder=5,facecolor="lightsteelblue", 
-                                        edgecolor="grey", linewidth=1)
+        years[attribute].plot.hist(ax=ax,  zorder=5,facecolor=color_bars, 
+                                        edgecolor=color_edges, linewidth=1)
         ax.set_xlabel(attribute, alpha=0.7)
 
         fig.add_subplot(ax)

@@ -304,9 +304,9 @@ def heatmap_ls(least_squares):
     ls = ls.reindex(ls.mean().sort_values().index,axis=1)
     ls = ls.transpose()
 
-    sns.heatmap(ls, square=True, cmap="PuBu", yticklabels=False, xticklabels=1, 
+    sns.heatmap(ls, square=True, cmap="Blues", yticklabels=False, xticklabels=1, 
                      cbar_kws = dict(use_gridspec=False,location="left",shrink= 0.3, pad=0.01), 
-                     ax=ax_heatmap)
+                     ax=ax_heatmap, linecolor="grey", linewidths=0.1)
     ax_heatmap.set_ylabel("Catchments", alpha=0.7)
     ax_heatmap.set_xlabel("Years", alpha=0.7)
     ax_heatmap.tick_params(axis=u'both', which=u'both',length=0)
@@ -324,10 +324,10 @@ def heatmap_ls(least_squares):
     # Plot the barplots
     # Dummy plot
     ax_bar_top = fig.add_subplot(gs[0,0])
-    year_avg.plot.bar(ax=ax_bar_top, color="lightsteelblue", zorder=5)
+    year_avg.plot.bar(ax=ax_bar_top, facecolor="steelblue",edgecolor="black", linewidth=0.1, zorder=5)
     ax_bar_top.get_legend().remove()
     ax_bar_right = fig.add_subplot(gs[1,1])
-    catchment_avg.plot.barh(ax=ax_bar_right, color="lightsteelblue", zorder=5)
+    catchment_avg.plot.barh(ax=ax_bar_right, facecolor="steelblue",edgecolor="black",linewidth =0.1, zorder=5)
     # Remove all borders and stuff
     for ax in [ax_bar_top, ax_bar_right]:
         for spine in ax.spines.values():
@@ -354,7 +354,7 @@ def heatmap_ls(least_squares):
     # Finishing touches    
     fig = plt.gcf()
     fig.set_size_inches(20,20)
-    plt.savefig("heatmap_lse.png", dpi=200, bbox_inches="tight")
+    plt.savefig("heatmap_lse.png", dpi=800, bbox_inches="tight")
     plt.close()
     
     
@@ -391,10 +391,10 @@ if __name__ == "__main__":
    years = ccdt.get_attributes_years()
    least_squares = pd.read_csv("least_square_all_catchments.csv", sep=";", index_col=0)
    del(least_squares["41510205"])
-  # heatmap_ls(least_squares)
+   heatmap_ls(least_squares)
 #   scatter_violin_least_squares_attribute(catchments, least_squares, 0)
 #   scatter_violin_least_squares_attribute(years, least_squares, 1)
 #   scatter_violin_lse_all_together(catchments, years, least_squares)
-   scatter_violin_lse_all_only_catchments(catchments, least_squares)
+ #  scatter_violin_lse_all_only_catchments(catchments, least_squares)
 #   kge = pd.read_csv("kge_all_years_catch.csv", sep=";", index_col=0)
 #   regplot_kge_lse(least_squares, kge)
