@@ -23,11 +23,11 @@ def plot_differences_catchments_years_by_least_squares_only_catchments(catchment
     Plots the attributes of the catchments seperated by the most complex and most simple catchments
         """
     fig = plt.figure(figsize=(15,22.5))
-    outer = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[1,1], hspace=0.15)
+    outer = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[1,1], hspace=0.20)
     
-    cat_grid = gridspec.GridSpecFromSubplotSpec(2,3, subplot_spec=outer[0], wspace=0.5, hspace=0.15)
+    cat_grid = gridspec.GridSpecFromSubplotSpec(2,3, subplot_spec=outer[0], wspace=0.65, hspace=0.20)
     
-    num_grid= gridspec.GridSpecFromSubplotSpec(2,3, subplot_spec=outer[1], wspace=0.2, hspace=0.15)
+    num_grid= gridspec.GridSpecFromSubplotSpec(2,3, subplot_spec=outer[1], wspace=0.2, hspace=0.20)
     axes = []
 
     # Get the predominant type for every year/catchment
@@ -67,7 +67,7 @@ def plot_differences_catchments_years_by_least_squares_only_catchments(catchment
 
             all_types_by_cat = all_types_by_cat.transpose()
             cat_for_whole_dataset = catchments[att].value_counts()
-            cat_for_whole_dataset.name = "overall (n=90)"
+            cat_for_whole_dataset.name = "overall (n=89)"
             cat_for_whole_dataset = pd.DataFrame(cat_for_whole_dataset).transpose()
             all_types_by_cat = pd.concat([all_types_by_cat, cat_for_whole_dataset], sort=True)
             # Make it percent
@@ -78,46 +78,50 @@ def plot_differences_catchments_years_by_least_squares_only_catchments(catchment
                 all_types_by_cat= all_types_by_cat.transpose().reindex(["very low", "low/very low", "low",
                                      "moderate/low", "moderate", "mid/moderate",
                                      "mid", "variable"]).transpose()
-            elif att == "
             ax = all_types_by_cat.plot(kind="bar", stacked=True, ax=ax, color=colors, edgecolor="grey", zorder=5)
-            legend = ax.legend(loc=7, fontsize=7,bbox_to_anchor=(1.3, 0.5))
+            handles, labels = ax.get_legend_handles_labels()
+            legend = ax.legend(handles[::-1], labels[::-1], loc=7, fontsize=7.5,bbox_to_anchor=(1.42, 0.5))
             for tick in ax.get_xticklabels():
                 tick.set_rotation(360)
             ax.set_ylabel("Relative Frequency [%]", alpha=0.7)
             ax.set_xlabel(att, alpha=0.7)
             i += 1
+            plt.setp(ax.get_xticklabels(), alpha=0.7, fontsize=7)
+
 
             
 
         else:
             ax = plt.Subplot(fig, num_grid[j]) 
             all_types = pd.concat([all_types, catchments[att]], axis=1)
-            all_types.columns = ["simple (n=18)", "complex (n=18)", "overall (n=90)"]
+            all_types.columns = ["simple (n=18)", "complex (n=18)", "overall (n=89)"]
 
-            ax = sns.swarmplot(data=all_types, ax=ax, zorder=4, color="steelblue", size=4)
+            ax = sns.swarmplot(data=all_types, ax=ax, zorder=4, color="steelblue", size=3)
             ax = sns.boxplot(data=all_types, showcaps=False,boxprops={'facecolor':'None', "edgecolor":"grey", "zorder":5},
                              showfliers=False,whiskerprops={'linewidth':0,}, ax=ax, zorder=5, width=0.3)
             ax.set_ylabel(att, alpha=0.7)
             statistic, p_value = scipy.stats.f_oneway(all_types["simple (n=18)"].dropna(), 
                                                       all_types["complex (n=18)"].dropna(),
-                                                      all_types["overall (n=90)"].dropna())
+                                                      all_types["overall (n=89)"].dropna())
             bonferoni_p_val_correction = 21
             pval = p_value*bonferoni_p_val_correction
             pval = 1 if pval > 1 else pval
-            ax.set_title(" ANOVA P-Value: " + str(round(pval,3)),alpha=0.7)
+            ax.set_title(" ANOVA P-Value: " + str(round(pval,3)),alpha=0.7, fontsize=10)
             j += 1
+            plt.setp(ax.get_xticklabels(), alpha=0.7, fontsize=8)
+
 
         ax.yaxis.grid(True, color="lightgrey",zorder=0)
         axes.append(ax)
         fig.add_subplot(ax)
         plt.setp(ax.get_yticklabels(), alpha=0.7)
-        plt.setp(ax.get_xticklabels(), alpha=0.7, fontsize=8)
         ax.tick_params(axis=u'both', which=u'both',length=0)
         for spine in ax.spines.values():
             spine.set_visible(False)
             
     fig = plt.gcf()
-    plt.savefig("all_together_most_extreme_catch.png", dpi=150,  bbox_inches="tight")
+    fig.set_size_inches(13,13)
+    plt.savefig("all_together_most_extreme_catch.png", dpi=300,  bbox_inches="tight")
     plt.close()      
 
 def plot_differences_catchments_years_by_least_squares_all_together(catchments, years, least_squares, amount_homogen):           
@@ -268,5 +272,5 @@ if __name__ == "__main__":
                'Aridity [/]'],inplace=True, axis=1)
    catchments.drop(['Land Use [/]', 'Area [km²]', 'Soil Depth [m]',
                     'Slope [/]'],inplace=True, axis=1)
-#   plot_differences_catchments_years_by_least_squares_all_together(catchments, years, least_squares, 0.2)
+   plot_differences_catchments_years_by_least_squares_all_together(catchments, years, least_squares, 0.2)
    plot_differences_catchments_years_by_least_squares_only_catchments(catchments, least_squares, 0.2)

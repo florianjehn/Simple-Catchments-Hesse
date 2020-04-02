@@ -23,10 +23,10 @@ def overview_plot(catchments, years):
     Plots all catchment and year attributes in one big figure to give an 
     overview of all catchments
     """
-    fig = plt.figure(figsize=(20,30))
+    fig = plt.figure(figsize=(12,20))
     outer = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[16,9], hspace=0.15)
     
-    catchments_grid = gridspec.GridSpecFromSubplotSpec(4,4, subplot_spec=outer[0], wspace=0.2, hspace=0.45)
+    catchments_grid = gridspec.GridSpecFromSubplotSpec(4,4, subplot_spec=outer[0], wspace=0.2, hspace=0.95)
     
     years_grid = gridspec.GridSpecFromSubplotSpec(2,4, subplot_spec=outer[1], wspace=0.2, hspace=0.2)
     
@@ -49,15 +49,15 @@ def overview_plot(catchments, years):
             else:
                 current_att.plot.bar(ax=ax,facecolor=color_bars, 
                                         edgecolor=color_edges, linewidth=1,zorder=5)
-            for tick in ax.get_xticklabels():
-                tick.set_rotation(50)
+            # for tick in ax.get_xticklabels():
+            #     tick.set_rotation(75)
             ax.set_xlabel("")
             ax.set_ylabel("Frequency")
         else:
             current_att.plot.hist(ax=ax,zorder=5,
                                   facecolor=color_bars, 
                                         edgecolor=color_edges, linewidth=1,)
-        ax.set_xlabel(attribute, alpha=0.7)
+        ax.set_title(attribute, alpha=0.7)
         fig.add_subplot(ax)
         axes.append(ax)
 
@@ -76,11 +76,12 @@ def overview_plot(catchments, years):
         plt.setp(ax.get_yticklabels(), alpha=0.7)
         plt.setp(ax.get_xticklabels(), alpha=0.7)
         ax.tick_params(axis=u'both', which=u'both',length=0)
-        for spine in ax.spines.values():
+        for i,spine in enumerate(ax.spines.values()):
+            if i == 2:
+                continue
             spine.set_visible(False)
         ax.yaxis.grid(True, color="lightgrey",zorder=0)
         ax.set_ylabel(ax.get_ylabel(), alpha=0.7)
-
     plt.savefig("overview.png", dpi=100, bbox_inches="tight")
     plt.close()
     
@@ -89,6 +90,18 @@ def overview_plot(catchments, years):
 if __name__ == "__main__":
    import preprocessing.cleaned_data.create_cleaned_data_table as ccdt
    catchments = ccdt.get_attributes_catchments()
+   # Climate first
+   catchments = catchments.reindex(['Act. Evapotranspiration [mm]', 'Discharge [mm]', 'Precipitation [mm]', 'Runoff-Ratio [/]',
+                       # Land use
+                       'Land Use [/]',
+                       # topography
+                        'Area [km²]',  'Elongation Ratio [/]','Slope [/]',
+                        # Soils
+                        'Soil Depth [m]','Soil Texture [/]','Soil Type [/]', 
+                        # Groundwater
+                        'Aquifer Conductivity [/]', 'Geology Type [/]', 'Ground Water Recharge [mm]',        'Permeability [/]'
+
+        ], axis=1)
 
    years = ccdt.get_attributes_years()
    years.drop(['soil_temp_C_1991_2018', 'mean_air_temperature'], axis=1, inplace=True)

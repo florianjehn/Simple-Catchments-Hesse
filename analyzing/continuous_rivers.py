@@ -303,15 +303,32 @@ def heatmap_ls(least_squares):
     ls = least_squares.copy()
     ls = ls.reindex(ls.mean().sort_values().index,axis=1)
     ls = ls.transpose()
+    # Reset index to make indentification easier
+    ls = ls.reset_index()
+    ls.index = ls.index + 1
+    del(ls["index"])
 
-    sns.heatmap(ls, square=True, cmap="Blues", yticklabels=False, xticklabels=1, 
+    sns.heatmap(ls, square=True, cmap="Blues",  yticklabels=True,
                      cbar_kws = dict(use_gridspec=False,location="left",shrink= 0.3, pad=0.01), 
                      ax=ax_heatmap, linecolor="grey", linewidths=0.1)
     ax_heatmap.set_ylabel("Catchments", alpha=0.7)
     ax_heatmap.set_xlabel("Years", alpha=0.7)
     ax_heatmap.tick_params(axis=u'both', which=u'both',length=0)
     plt.setp(ax_heatmap.get_xticklabels(), alpha=0.7)
+    plt.setp(ax_heatmap.get_yticklabels(), alpha=0.7)
     
+    # Set the visibility of the ticklabels
+    temp = ax_heatmap.xaxis.get_ticklabels()
+    temp = list(set(temp) - set(temp[1::2]))
+    for label in temp:
+        label.set_visible(False)
+        
+    temp = ax_heatmap.yaxis.get_ticklabels()
+    temp = list(set(temp) - set(temp[1::2]))
+    for label in temp:
+        label.set_visible(False)
+
+
     cbar = ax_heatmap.collections[0].colorbar
     # here set the labelsize by 20
     cbar.ax.set_ylabel("Mean Least Square Error [/]", alpha=0.7)
@@ -342,9 +359,9 @@ def heatmap_ls(least_squares):
     plt.setp(ax_bar_top.get_xticklabels(), alpha=0)
     plt.setp(ax_bar_right.get_yticklabels(), alpha=0)
     plt.setp(ax_bar_right.get_xticklabels(), alpha=0.7) 
-
-    ax_bar_top.set_title("Yearly Mean of the Mean Least Square Error [/]", alpha=0.7)      
-    ax_bar_right.set_ylabel("Catchment Mean of the Mean Least Square Error [/]", alpha=0.7, labelpad=-200, rotation=270)
+    fontsize=10
+    ax_bar_top.set_title("Yearly Mean of the Mean Least Squares [/]", alpha=0.7, fontsize=fontsize)      
+    ax_bar_right.set_ylabel("Catchment Mean of the Mean Least Squares [/]", alpha=0.7, labelpad=-120, rotation=270, fontsize=fontsize)
 
     for tick in ax_bar_right.get_xticklabels():
         tick.set_rotation(90)     
@@ -353,8 +370,8 @@ def heatmap_ls(least_squares):
     ax_bar_top.set_position([0.618,0.69, 0.175, 0.1])
     # Finishing touches    
     fig = plt.gcf()
-    fig.set_size_inches(20,20)
-    plt.savefig("heatmap_lse.png", dpi=800, bbox_inches="tight")
+    fig.set_size_inches(15,15)
+    plt.savefig("heatmap_lse.png", dpi=500, bbox_inches="tight")
     plt.close()
     
     
