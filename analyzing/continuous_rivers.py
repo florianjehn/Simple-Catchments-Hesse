@@ -109,12 +109,12 @@ def scatter_violin_lse_all_only_catchments(catchments, least_squares):
     Plots the scatter and violin plots only for the catchments
     
     """
-    fig = plt.figure(figsize=(15 ,22.5))
-    outer = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[2,3], hspace=0.2)
+    fig = plt.figure(figsize=(12.5 ,15))
+    outer = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[2,3], hspace=0.4)
     
-    cat_grid = gridspec.GridSpecFromSubplotSpec(2,3, subplot_spec=outer[0], wspace=0.3, hspace=0.6)
+    cat_grid = gridspec.GridSpecFromSubplotSpec(2,3, subplot_spec=outer[0], wspace=0.3, hspace=1)
     
-    num_grid = gridspec.GridSpecFromSubplotSpec(3,3, subplot_spec=outer[1], wspace=0.3, hspace=0.3)
+    num_grid = gridspec.GridSpecFromSubplotSpec(3,3, subplot_spec=outer[1], wspace=0.3, hspace=0.5)
     
     axes = []
     j = 0
@@ -145,19 +145,19 @@ def scatter_violin_lse_all_only_catchments(catchments, least_squares):
         bonferoni_p_val_correction = 21
         if all_data_attribute[attribute].dtype != float:
             ax = plt.Subplot(fig, cat_grid[i])
-            sns.violinplot(y="catchment_least_square", data=all_data_attribute, x=attribute,ax=ax, color="lightsteelblue", zorder=5)
-         #   print(all_data_attribute)
+            sns.swarmplot(y="catchment_least_square", data=all_data_attribute, x=attribute,ax=ax, color="steelblue", zorder=5, size=0.8)
+            sns.boxplot(y="catchment_least_square", data=all_data_attribute, x=attribute, showcaps=False,boxprops={'facecolor':'None', "edgecolor":"grey", "zorder":5,'linewidth':2},
+                                                showfliers=False,whiskerprops={'linewidth':0,}, ax=ax, zorder=5, width=0.4)
             values_per_group = [col.dropna() for col_name, col in all_data_attribute.groupby(attribute)["catchment_least_square"]]
-#            for key, val in values_per_group.items():
-#                print(key)
-#                print(val)
+
             statistic, pval = scipy.stats.f_oneway(*values_per_group)
             for tick in ax.get_xticklabels():
-                tick.set_rotation(50)
+                tick.set_rotation(90)
             pval = pval*bonferoni_p_val_correction
             pval = 1 if pval > 1 else pval
             ax.set_title("P-Value: " + str(round(pval,3)),alpha=0.7)
             ax.set_xlabel(attribute, alpha=0.7)
+            ax.yaxis.grid(True, color="lightgrey")
             if attribute == "Land Use [/]":
                 ax.set_xlim(-0.5,2.5)
             i += 1
@@ -181,7 +181,7 @@ def scatter_violin_lse_all_only_catchments(catchments, least_squares):
             pval = 1 if pval > 1 else pval
             ax.set_title("P-Value: " + str(round(pval,3)),alpha=0.7)
             j += 1
-        ax.set_ylabel("Mean Least Square Error [/]",alpha=.7) 
+        ax.set_ylabel("Mean Least Squares [/]",alpha=.7) 
         # Make nicer
         plt.setp(ax.get_yticklabels(), alpha=0.7)
         plt.setp(ax.get_xticklabels(), alpha=0.7)
@@ -192,8 +192,31 @@ def scatter_violin_lse_all_only_catchments(catchments, least_squares):
         
         axes.append(ax)
         fig.add_subplot(ax)
+        
+        
+    # Add suptitles for gridspec
+    rect_top = 0.5, 0.9, 0, 0.0  # lower, left, width, height (I use a lower height than 1.0, to place the title more visible)
+    rect_bottom = 0.5, 0.52, 0, 0
+    ax_top = fig.add_axes(rect_top)
+    ax_bottom = fig.add_axes(rect_bottom)
+    ax_top.set_xticks([])
+    ax_top.set_yticks([])
+    ax_top.spines['right'].set_visible(False)
+    ax_top.spines['top'].set_visible(False)
+    ax_top.spines['bottom'].set_visible(False)
+    ax_top.spines['left'].set_visible(False)
+    ax_top.set_facecolor('none')
+    ax_bottom.set_xticks([])
+    ax_bottom.set_yticks([])
+    ax_bottom.spines['right'].set_visible(False)
+    ax_bottom.spines['top'].set_visible(False)
+    ax_bottom.spines['bottom'].set_visible(False)
+    ax_bottom.spines['left'].set_visible(False)
+    ax_bottom.set_facecolor('none')
+    ax_top.set_title('Categorical Attributes', fontsize=16, alpha=0.7)
+    ax_bottom.set_title('Numerical Attributes', fontsize=16, alpha=0.7)
 
-    plt.savefig("catchment_regressions_attributes.png", dpi=200, bbox_inches="tight")
+    plt.savefig("catchment_regressions_attributes.png", dpi=300, bbox_inches="tight")
     plt.close()
             
 
@@ -239,9 +262,6 @@ def scatter_violin_least_squares_attribute(catch_year, least_squares, axis):
             sns.violinplot(y="catchment_least_square", data=all_data_attribute, x=attribute,ax=ax, color="lightsteelblue", zorder=5)
          #   print(all_data_attribute)
             values_per_group = [col.dropna() for col_name, col in all_data_attribute.groupby(attribute)["catchment_least_square"]]
-#            for key, val in values_per_group.items():
-#                print(key)
-#                print(val)
             statistic, pval = scipy.stats.f_oneway(*values_per_group)
             for tick in ax.get_xticklabels():
                 tick.set_rotation(50)
@@ -331,7 +351,7 @@ def heatmap_ls(least_squares):
 
     cbar = ax_heatmap.collections[0].colorbar
     # here set the labelsize by 20
-    cbar.ax.set_ylabel("Mean Least Square Error [/]", alpha=0.7)
+    cbar.ax.set_ylabel("Mean Least Squares [/]", alpha=0.7)
     plt.setp(cbar.ax.get_yticklabels(), alpha=0.7)
     cbar.ax.tick_params(color="lightgrey")
     # Calculate the averages for the bar plots
@@ -404,7 +424,18 @@ def regplot_kge_lse(lse, kge):
 if __name__ == "__main__":
    import preprocessing.cleaned_data.create_cleaned_data_table as ccdt
    catchments = ccdt.get_attributes_catchments()
-   
+   # Climate first
+   catchments = catchments.reindex(['Act. Evapotranspiration [mm]', 'Discharge [mm]', 'Precipitation [mm]', 'Runoff-Ratio [/]',
+                       # Land use
+                       'Land Use [/]',
+                       # topography
+                        'Area [km²]',  'Elongation Ratio [/]','Slope [/]',
+                        # Soils
+                        'Soil Depth [m]','Soil Texture [/]','Soil Type [/]', 
+                        # Groundwater
+                        'Aquifer Conductivity [/]', 'Geology Type [/]', 'Ground Water Recharge [mm]',        'Permeability [/]'
+
+        ], axis=1)
    years = ccdt.get_attributes_years()
    least_squares = pd.read_csv("least_square_all_catchments.csv", sep=";", index_col=0)
    del(least_squares["41510205"])
@@ -412,6 +443,6 @@ if __name__ == "__main__":
 #   scatter_violin_least_squares_attribute(catchments, least_squares, 0)
 #   scatter_violin_least_squares_attribute(years, least_squares, 1)
 #   scatter_violin_lse_all_together(catchments, years, least_squares)
- #  scatter_violin_lse_all_only_catchments(catchments, least_squares)
+#   scatter_violin_lse_all_only_catchments(catchments, least_squares)
 #   kge = pd.read_csv("kge_all_years_catch.csv", sep=";", index_col=0)
 #   regplot_kge_lse(least_squares, kge)

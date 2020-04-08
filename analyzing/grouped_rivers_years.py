@@ -23,7 +23,7 @@ def plot_differences_catchments_years_by_least_squares_only_catchments(catchment
     Plots the attributes of the catchments seperated by the most complex and most simple catchments
         """
     fig = plt.figure(figsize=(15,22.5))
-    outer = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[1,1], hspace=0.20)
+    outer = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[1,1], hspace=0.25)
     
     cat_grid = gridspec.GridSpecFromSubplotSpec(2,3, subplot_spec=outer[0], wspace=0.65, hspace=0.20)
     
@@ -119,6 +119,30 @@ def plot_differences_catchments_years_by_least_squares_only_catchments(catchment
         for spine in ax.spines.values():
             spine.set_visible(False)
             
+            
+    # Add suptitles for gridspec
+    rect_top = 0.5, 0.88, 0, 0.0  # lower, left, width, height (I use a lower height than 1.0, to place the title more visible)
+    rect_bottom = 0.5, 0.47, 0, 0
+    ax_top = fig.add_axes(rect_top)
+    ax_bottom = fig.add_axes(rect_bottom)
+    ax_top.set_xticks([])
+    ax_top.set_yticks([])
+    ax_top.spines['right'].set_visible(False)
+    ax_top.spines['top'].set_visible(False)
+    ax_top.spines['bottom'].set_visible(False)
+    ax_top.spines['left'].set_visible(False)
+    ax_top.set_facecolor('none')
+    ax_bottom.set_xticks([])
+    ax_bottom.set_yticks([])
+    ax_bottom.spines['right'].set_visible(False)
+    ax_bottom.spines['top'].set_visible(False)
+    ax_bottom.spines['bottom'].set_visible(False)
+    ax_bottom.spines['left'].set_visible(False)
+    ax_bottom.set_facecolor('none')
+    ax_top.set_title('Categorical Attributes', fontsize=16, alpha=0.7)
+    ax_bottom.set_title('Numerical Attributes', fontsize=16, alpha=0.7)
+    
+    
     fig = plt.gcf()
     fig.set_size_inches(13,13)
     plt.savefig("all_together_most_extreme_catch.png", dpi=300,  bbox_inches="tight")
@@ -261,6 +285,18 @@ def plot_differences_catchments_years_by_least_squares(least_squares, attributes
 if __name__ == "__main__":
    import preprocessing.cleaned_data.create_cleaned_data_table as ccdt
    catchments = ccdt.get_attributes_catchments()
+   # Climate first
+   catchments = catchments.reindex(['Act. Evapotranspiration [mm]', 'Discharge [mm]', 'Precipitation [mm]', 'Runoff-Ratio [/]',
+                       # Land use
+                       'Land Use [/]',
+                       # topography
+                        'Area [km²]',  'Elongation Ratio [/]','Slope [/]',
+                        # Soils
+                        'Soil Depth [m]','Soil Texture [/]','Soil Type [/]', 
+                        # Groundwater
+                        'Aquifer Conductivity [/]', 'Geology Type [/]', 'Ground Water Recharge [mm]',        'Permeability [/]'
+
+        ], axis=1)
    years = ccdt.get_attributes_years()
    least_squares = pd.read_csv("least_square_all_catchments.csv", sep=";", index_col=0)
 #   plot_differences_catchments_years_by_least_squares(least_squares, catchments , 0.2, "catch")
@@ -272,5 +308,5 @@ if __name__ == "__main__":
                'Aridity [/]'],inplace=True, axis=1)
    catchments.drop(['Land Use [/]', 'Area [km²]', 'Soil Depth [m]',
                     'Slope [/]'],inplace=True, axis=1)
-   plot_differences_catchments_years_by_least_squares_all_together(catchments, years, least_squares, 0.2)
+ #  plot_differences_catchments_years_by_least_squares_all_together(catchments, years, least_squares, 0.2)
    plot_differences_catchments_years_by_least_squares_only_catchments(catchments, least_squares, 0.2)
