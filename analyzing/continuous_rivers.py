@@ -155,7 +155,7 @@ def scatter_violin_lse_all_only_catchments(catchments, least_squares):
                 tick.set_rotation(90)
             pval = pval*bonferoni_p_val_correction
             pval = 1 if pval > 1 else pval
-            ax.set_title("P-Value: " + str(round(pval,3)),alpha=0.7)
+            ax.set_title("ANOVA P-Value: " + str(round(pval,3)),alpha=0.7)
             ax.set_xlabel(attribute, alpha=0.7)
             ax.yaxis.grid(True, color="lightgrey")
             if attribute == "Land Use [/]":
@@ -179,7 +179,7 @@ def scatter_violin_lse_all_only_catchments(catchments, least_squares):
             ax.set_xlim(all_data_attribute[attribute].min(), all_data_attribute[attribute].max())
             pval = results[3]*bonferoni_p_val_correction
             pval = 1 if pval > 1 else pval
-            ax.set_title("P-Value: " + str(round(pval,3)),alpha=0.7)
+            ax.set_title("Regression Trend P-Value: " + str(round(pval,3)),alpha=0.7)
             j += 1
         ax.set_ylabel("Mean Least Squares [/]",alpha=.7) 
         # Make nicer
@@ -439,10 +439,10 @@ if __name__ == "__main__":
    years = ccdt.get_attributes_years()
    least_squares = pd.read_csv("least_square_all_catchments.csv", sep=";", index_col=0)
    del(least_squares["41510205"])
-   heatmap_ls(least_squares)
+#   heatmap_ls(least_squares)
 #   scatter_violin_least_squares_attribute(catchments, least_squares, 0)
 #   scatter_violin_least_squares_attribute(years, least_squares, 1)
 #   scatter_violin_lse_all_together(catchments, years, least_squares)
-#   scatter_violin_lse_all_only_catchments(catchments, least_squares)
+   scatter_violin_lse_all_only_catchments(catchments, least_squares)
 #   kge = pd.read_csv("kge_all_years_catch.csv", sep=";", index_col=0)
 #   regplot_kge_lse(least_squares, kge)

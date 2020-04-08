@@ -18,24 +18,33 @@ file_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.sep.join(file_dir.split(os.sep)[:-1]))
 
 
-def overview_plot(catchments, years):
+def overview_plot(catchments):
     """
     Plots all catchment and year attributes in one big figure to give an 
     overview of all catchments
     """
-    fig = plt.figure(figsize=(12,20))
-    outer = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[16,9], hspace=0.15)
+    fig = plt.figure(figsize=(12.5 ,15))
+    outer = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[2,3], hspace=0.4)
     
-    catchments_grid = gridspec.GridSpecFromSubplotSpec(4,4, subplot_spec=outer[0], wspace=0.2, hspace=0.95)
+    cat_grid = gridspec.GridSpecFromSubplotSpec(2,3, subplot_spec=outer[0], wspace=0.3, hspace=1)
+    cat_att = ['Land Use [/]', 'Soil Texture [/]', 'Soil Type [/]',
+               'Aquifer Conductivity [/]', 'Geology Type [/]','Permeability [/]']
     
-    years_grid = gridspec.GridSpecFromSubplotSpec(2,4, subplot_spec=outer[1], wspace=0.2, hspace=0.2)
+    num_grid = gridspec.GridSpecFromSubplotSpec(3,3, subplot_spec=outer[1], wspace=0.3, hspace=0.5)
     
     axes = []
-    color_bars = "steelblue"
+    color_bars = "#529DCC"
     color_edges = "black"
-    for i, attribute in enumerate(catchments.columns):
+    cat_count = 0
+    num_count = 0
+    for attribute in catchments.columns:
         current_att = catchments[attribute]
-        ax = plt.Subplot(fig, catchments_grid[i])
+        if attribute in cat_att:    
+            ax = plt.Subplot(fig, cat_grid[cat_count])
+            cat_count += 1
+        else:
+            ax = plt.Subplot(fig, num_grid[num_count])
+            num_count += 1            
         if current_att.dtypes != float:
             current_att = catchments.groupby(attribute)[attribute].count()
             if attribute == "Permeability [/]":
@@ -62,14 +71,7 @@ def overview_plot(catchments, years):
         axes.append(ax)
 
         
-    for j, attribute in enumerate(years.columns):
-        ax = plt.Subplot(fig, years_grid[j])
-        years[attribute].plot.hist(ax=ax,  zorder=5,facecolor=color_bars, 
-                                        edgecolor=color_edges, linewidth=1)
-        ax.set_xlabel(attribute, alpha=0.7)
 
-        fig.add_subplot(ax)
-        axes.append(ax)
     
     for ax in axes:
         # Make it nice
@@ -82,7 +84,31 @@ def overview_plot(catchments, years):
             spine.set_visible(False)
         ax.yaxis.grid(True, color="lightgrey",zorder=0)
         ax.set_ylabel(ax.get_ylabel(), alpha=0.7)
-    plt.savefig("overview.png", dpi=100, bbox_inches="tight")
+        
+        # Add suptitles for gridspec
+    rect_top = 0.5, 0.9, 0, 0.0  # lower, left, width, height (I use a lower height than 1.0, to place the title more visible)
+    rect_bottom = 0.5, 0.52, 0, 0
+    ax_top = fig.add_axes(rect_top)
+    ax_bottom = fig.add_axes(rect_bottom)
+    ax_top.set_xticks([])
+    ax_top.set_yticks([])
+    ax_top.spines['right'].set_visible(False)
+    ax_top.spines['top'].set_visible(False)
+    ax_top.spines['bottom'].set_visible(False)
+    ax_top.spines['left'].set_visible(False)
+    ax_top.set_facecolor('none')
+    ax_bottom.set_xticks([])
+    ax_bottom.set_yticks([])
+    ax_bottom.spines['right'].set_visible(False)
+    ax_bottom.spines['top'].set_visible(False)
+    ax_bottom.spines['bottom'].set_visible(False)
+    ax_bottom.spines['left'].set_visible(False)
+    ax_bottom.set_facecolor('none')
+    ax_top.set_title('Categorical Attributes', fontsize=16, alpha=0.7)
+    ax_bottom.set_title('Numerical Attributes', fontsize=16, alpha=0.7)    
+    
+    
+    plt.savefig("overview.png", dpi=200, bbox_inches="tight")
     plt.close()
     
     
@@ -103,6 +129,4 @@ if __name__ == "__main__":
 
         ], axis=1)
 
-   years = ccdt.get_attributes_years()
-   years.drop(['soil_temp_C_1991_2018', 'mean_air_temperature'], axis=1, inplace=True)
-   overview_plot(catchments, years)
+   overview_plot(catchments)
