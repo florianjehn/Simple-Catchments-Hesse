@@ -18,24 +18,24 @@ import matplotlib
 file_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.sep.join(file_dir.split(os.sep)[:-1]))
 
-def plot_differences_catchments_years_by_least_squares_only_catchments(catchments, least_squares, amount_homogen):           
+def plot_differences_catchments_years_by_nse_only_catchments(catchments, nse, amount_homogen):           
     """
     Plots the attributes of the catchments seperated by the most complex and most simple catchments
         """
     fig = plt.figure(figsize=(15,22.5))
-    outer = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[1,1], hspace=0.25)
+    outer = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[1,2], hspace=0.25)
     
-    cat_grid = gridspec.GridSpecFromSubplotSpec(2,3, subplot_spec=outer[0], wspace=0.65, hspace=0.20)
+    cat_grid = gridspec.GridSpecFromSubplotSpec(2,3, subplot_spec=outer[0], wspace=0.65, hspace=0.30)
     
-    num_grid= gridspec.GridSpecFromSubplotSpec(2,3, subplot_spec=outer[1], wspace=0.2, hspace=0.20)
+    num_grid= gridspec.GridSpecFromSubplotSpec(3,3, subplot_spec=outer[1], wspace=0.2, hspace=0.30)
     axes = []
 
     # Get the predominant type for every year/catchment
-    mean_least_squares = least_squares.mean(axis=0)
+    mean_nse = nse.mean(axis=0)
         
     # Find the year/catchment that have the highest and lowest least square error
-    simple_catch_year = mean_least_squares[mean_least_squares < mean_least_squares.quantile(amount_homogen)].index.astype(float)
-    complex_catch_year = mean_least_squares[mean_least_squares > mean_least_squares.quantile(1-amount_homogen)].index.astype(float)
+    complex_catch_year = mean_nse[mean_nse < mean_nse.quantile(amount_homogen)].index.astype(float)
+    simple_catch_year = mean_nse[mean_nse > mean_nse.quantile(1-amount_homogen)].index.astype(float)
     most_homogen = {"simple (n=18)": simple_catch_year, "complex (n=18)":complex_catch_year}
         
     # Create a figure for every attribute
@@ -54,7 +54,9 @@ def plot_differences_catchments_years_by_least_squares_only_catchments(catchment
      #       print(attributes_for_one_type)
             
         all_types = pd.concat([attributes_for_types[type_catch] for type_catch in attributes_for_types.keys()],axis=1)
-     #   print(all_types)
+        print()
+        cmap = matplotlib.cm.get_cmap("PuBu")
+        colors = [cmap(i / len(catchments[att].unique())) for i in range(len(catchments[att].unique())+1)]
 
         # if they are not flaot or int they should be categorical
         if catchments[att].dtypes != np.float64 and catchments[att].dtypes != np.int64:
@@ -62,8 +64,6 @@ def plot_differences_catchments_years_by_least_squares_only_catchments(catchment
 
             all_types_by_cat = pd.concat([all_types.groupby(col).count() for col in all_types.columns],axis=1, sort=True)
             all_types_by_cat = all_types_by_cat[all_types_by_cat.columns[::-1]]
-            cmap = matplotlib.cm.get_cmap("PuBu")
-            colors = [cmap(i / len(all_types_by_cat.transpose().columns)) for i in range(len(all_types_by_cat.transpose().columns)+1)]
 
             all_types_by_cat = all_types_by_cat.transpose()
             cat_for_whole_dataset = catchments[att].value_counts()
@@ -103,7 +103,7 @@ def plot_differences_catchments_years_by_least_squares_only_catchments(catchment
             statistic, p_value = scipy.stats.f_oneway(all_types["simple (n=18)"].dropna(), 
                                                       all_types["complex (n=18)"].dropna(),
                                                       all_types["overall (n=89)"].dropna())
-            bonferoni_p_val_correction = 21
+            bonferoni_p_val_correction = 20
             pval = p_value*bonferoni_p_val_correction
             pval = 1 if pval > 1 else pval
             ax.set_title(" ANOVA P-Value: " + str(round(pval,3)),alpha=0.7, fontsize=10)
@@ -122,7 +122,7 @@ def plot_differences_catchments_years_by_least_squares_only_catchments(catchment
             
     # Add suptitles for gridspec
     rect_top = 0.5, 0.88, 0, 0.0  # lower, left, width, height (I use a lower height than 1.0, to place the title more visible)
-    rect_bottom = 0.5, 0.47, 0, 0
+    rect_bottom = 0.5, 0.59, 0, 0
     ax_top = fig.add_axes(rect_top)
     ax_bottom = fig.add_axes(rect_bottom)
     ax_top.set_xticks([])
@@ -164,10 +164,9 @@ if __name__ == "__main__":
                         'Aquifer Conductivity [/]', 'Geology Type [/]', 'Ground Water Recharge [mm]',        'Permeability [/]'
 
         ], axis=1)
-   least_squares = pd.read_csv("least_square_all_catchments.csv", sep=";", index_col=0)
+   nse = pd.read_csv("nse_all_catchments.csv", sep=";", index_col=0)
    
    # Exclude non significant attributes
 
-   catchments.drop(['Land Use [/]', 'Area [km²]', 'Soil Depth [m]',
-                    'Slope [/]'],inplace=True, axis=1)
-   plot_differences_catchments_years_by_least_squares_only_catchments(catchments, least_squares, 0.2)
+   catchments.drop(['Soil Depth [m]'],inplace=True, axis=1)
+   plot_differences_catchments_years_by_nse_only_catchments(catchments, nse, 0.2)

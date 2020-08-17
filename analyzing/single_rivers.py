@@ -34,19 +34,30 @@ def plot_Q_vs_cumdS_scatter(dataframes, water_year=False):
             year_df["cdS"] = np.cumsum(year_df["dS"])
             cdS = year_df.loc[year_df["P"] == 0, "cdS"]
             Q = year_df.loc[year_df["P"] == 0,"Q"]
-            sc = plt.scatter(cdS, Q, c=c, cmap="coolwarm", edgecolors ="black", linewidths =0.2)
-            plt.title("catchment: " + str(catch) + ", year: " + str(year)+" (no rain)")
-            plt.xlabel("cum dS")
-            plt.ylabel("Q")
+            sc = plt.scatter(cdS, Q, c=c, cmap="coolwarm", edgecolors ="black", linewidths =0.2, zorder=5)
+            plt.title("Catchment: " + str(catch) + ", Year: " + str(year), alpha=0.7)
+            plt.xlabel("Cummulative Storage Change [mm]", alpha=0.7)
+            plt.ylabel("Discharge [mm $d^{-1}$]", alpha=0.7)
             try:
-                plt.legend(*sc.legend_elements())
+                legend = plt.legend(*sc.legend_elements(), title="Hydrological Month")
+                for text in legend.get_texts():
+                    text.set_color("#797979")  
+                legend.get_title().set_color("#797979")
             except ValueError as val:
                 print(catch)
                 print(year)
                 print(val)
-            #cbar = plt.colorbar(sc)
-           # cbar.ax.set_ylabel('month', rotation=270)
-            plt.savefig(str(catch) + "_" + str(year) + ".png")
+            # Make the plot nicer    
+            ax = plt.gca()
+            ax.tick_params(axis=u'both', which=u'both',length=0)
+            ax.grid(True, color="lightgrey", zorder=0)
+            for spine in ax.spines.values():
+                spine.set_visible(False)    
+            plt.setp(ax.get_xticklabels(), alpha=0.7)
+            plt.setp(ax.get_yticklabels(), alpha=0.7)
+            fig = plt.gcf()
+            fig.set_size_inches(8,8)
+            plt.savefig("q_vs_dS/"+ str(catch) + "_" + str(year) + "_no_rain.png", dpi=150, bbox_inches="tight")
             plt.close()
             
 def plot_Q_vs_cumdS_line(dataframes, water_year=False):
@@ -78,7 +89,7 @@ def plot_Q_vs_cumdS_line(dataframes, water_year=False):
             plt.xlabel("cum dS")
             plt.ylabel("Q")
 
-            plt.savefig(str(catch) + "_" + str(year) + ".png")
+            plt.savefig(str(catch) + "_" + str(year) + ".png", dpi=100)
             plt.close()
             
                
@@ -89,7 +100,7 @@ def find_all_exp(dataframes:dict, water_year=False):
     year
     """
     parameters_all_catchments = pd.DataFrame(columns=list(dataframes.keys()), index=[year for year in range(1991, 2019)])
-    least_squares_all_catchments = pd.DataFrame(columns=list(dataframes.keys()), index=[year for year in range(1991, 2019)])
+    nse_all_catchments = pd.DataFrame(columns=list(dataframes.keys()), index=[year for year in range(1991, 2019)])
     for catch in dataframes.keys():
         df = dataframes[catch]
         grouped_years = df.groupby("water_year") if water_year else df.groupby(df.index.year)
@@ -124,13 +135,13 @@ def find_all_exp(dataframes:dict, water_year=False):
                 # Find the least sqaure difference from the polynomial and the
                 # real data
                 y_sim = exponential(x, *optimal_parameters)
-                least_squares = calc_least_squares(y, y_sim)
-                mean_least_squares = least_squares/len(y)
-                least_squares_all_catchments.loc[year,catch] = mean_least_squares
+                nse = calc_nse(y, y_sim)
+          #      mean_nse = nse/len(y)
+                nse_all_catchments.loc[year,catch] = nse
         print("Finished: ")
         print(catch)
 
-    return parameters_all_catchments, least_squares_all_catchments
+    return parameters_all_catchments, nse_all_catchments
             
         
 def find_exponential_function(x,y):
@@ -139,10 +150,24 @@ def find_exponential_function(x,y):
     return optimal_parameters
       
 
-def calc_least_squares(real, sim):
-    dif = real - sim
-    dif = dif ** 2
-    return dif.sum()         
+# def calc_least_squares(real, sim):
+#     dif = real - sim
+#     dif = dif ** 2
+#     return dif.sum()         
+
+
+def calc_nse(real, sim):
+    """
+    Nash-Sutcliffe efficinecy
+    """
+    s, e = np.array(sim), np.array(real)
+    # s,e=simulation,evaluation
+    mean_observed = np.nanmean(e)
+    # compute numerator and denominator
+    numerator = np.nansum((e - s) ** 2)
+    denominator = np.nansum((e - mean_observed)**2)
+    # compute coefficient
+    return 1 - (numerator / denominator)
 
 
 def exponential(x,c, k):
@@ -182,12 +207,12 @@ if __name__ == '__main__':
     et_cor.correct_and_save_ET(dataframes)
     calculate_dS(dataframes)
     
-    parameters_all_catchments, least_squares_all_catchments = find_all_exp(dataframes, water_year=True)
-    # Remove empty year 1991
-    least_squares_all_catchments.drop(least_squares_all_catchments.index[:1], inplace=True)
-    least_squares_all_catchments.to_csv("least_square_all_catchments.csv", sep=";")
+    parameters_all_catchments, nse_all_catchments = find_all_exp(dataframes, water_year=True)
+#    Remove empty year 1991
+    nse_all_catchments.drop(nse_all_catchments.index[:1], inplace=True)
+    nse_all_catchments.to_csv("nse_all_catchments.csv", sep=";")
     
-    plot_Q_vs_cumdS_scatter(dataframes, water_year=True)
+#    plot_Q_vs_cumdS_scatter(dataframes, water_year=True)
 
        
 

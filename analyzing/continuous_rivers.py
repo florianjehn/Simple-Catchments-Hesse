@@ -13,7 +13,7 @@ sys.path.append(os.sep.join(file_dir.split(os.sep)[:-1]))
 
             
     
-def scatter_swarm_lse_all_only_catchments(catchments, least_squares):           
+def scatter_swarm_lse_all_only_catchments(catchments, nse):           
     """
     Plots the scatter and violin plots only for the catchments
     
@@ -33,31 +33,31 @@ def scatter_swarm_lse_all_only_catchments(catchments, least_squares):
         print(attribute)
         if attribute == "gauge":
             continue
-        iterate = least_squares.columns
+        iterate = nse.columns
         collect = []
         for single_catch in iterate:
             # Skip catchments with much missing or stepwise data
             if single_catch in ["23950104", "24781159", "24781206", "428832990", "42870057"]:
                 print("Skipped: " + str(single_catch))
                 continue
-            least_square_single = least_squares.loc[:,single_catch]
-            least_square_single.name = "catchment_least_square"
+            nse_single = nse.loc[:,single_catch]
+            nse_single.name = "catchment_nse"
             current_catch_att = catchments.loc[ int(single_catch), attribute]
             # Make attribute as long as the least squares
-            current_catch_att = pd.Series([current_catch_att] * len(least_square_single), index=least_square_single.index)
+            current_catch_att = pd.Series([current_catch_att] * len(nse_single), index=nse_single.index)
             current_catch_att.name=attribute
-            combined = pd.concat([least_square_single, pd.Series(current_catch_att)],axis=1)
+            combined = pd.concat([nse_single, pd.Series(current_catch_att)],axis=1)
             collect.append(combined)
         all_data_attribute = pd.concat(collect,ignore_index=True)
 
         fig = plt.gcf()
-        bonferoni_p_val_correction = 21
+        bonferoni_p_val_correction = 24
         if all_data_attribute[attribute].dtype != float:
             ax = plt.Subplot(fig, cat_grid[i])
-            sns.swarmplot(y="catchment_least_square", data=all_data_attribute, x=attribute,ax=ax, color="steelblue", zorder=5, size=0.8)
-            sns.boxplot(y="catchment_least_square", data=all_data_attribute, x=attribute, showcaps=False,boxprops={'facecolor':'None', "edgecolor":"grey", "zorder":5,'linewidth':2},
+            sns.swarmplot(y="catchment_nse", data=all_data_attribute, x=attribute,ax=ax, color="steelblue", zorder=5, size=0.8)
+            sns.boxplot(y="catchment_nse", data=all_data_attribute, x=attribute, showcaps=False,boxprops={'facecolor':'None', "edgecolor":"grey", "zorder":5,'linewidth':2},
                                                 showfliers=False,whiskerprops={'linewidth':0,}, ax=ax, zorder=5, width=0.4)
-            values_per_group = [col.dropna() for col_name, col in all_data_attribute.groupby(attribute)["catchment_least_square"]]
+            values_per_group = [col.dropna() for col_name, col in all_data_attribute.groupby(attribute)["catchment_nse"]]
 
             statistic, pval = scipy.stats.f_oneway(*values_per_group)
             for tick in ax.get_xticklabels():
@@ -76,7 +76,7 @@ def scatter_swarm_lse_all_only_catchments(catchments, least_squares):
             
             ax = plt.Subplot(fig, num_grid[j])
             x = all_data_attribute[attribute].astype(float)
-            y = all_data_attribute["catchment_least_square"]
+            y = all_data_attribute["catchment_nse"]
             xy = pd.concat([x,y],axis=1)
             xy.dropna(inplace=True)
             results = scipy.stats.linregress(xy)           
@@ -90,7 +90,7 @@ def scatter_swarm_lse_all_only_catchments(catchments, least_squares):
             pval = 1 if pval > 1 else pval
             ax.set_title("Regression Trend P-Value: " + str(round(pval,3)),alpha=0.7)
             j += 1
-        ax.set_ylabel("Mean Least Squares [/]",alpha=.7) 
+        ax.set_ylabel("NSE [/]",alpha=.7) 
         # Make nicer
         plt.setp(ax.get_yticklabels(), alpha=0.7)
         plt.setp(ax.get_xticklabels(), alpha=0.7)
@@ -143,15 +143,15 @@ def find_unique_pairs(cats):
     return list(set(unique_pairs))
 
 
-def heatmap_ls(least_squares):
-    """Creats a heatmap of the least squares with bar plots on each
+def heatmap_ls(nse):
+    """Creats a heatmap of the nse with bar plots on each
     side to mark the mean """
     # Create the gridspec
-    gs = gridspec.GridSpec(2,2, height_ratios=[1,3], width_ratios = [30, 1], hspace=0, wspace=-1.513)
+    gs = gridspec.GridSpec(2,2, height_ratios=[1,3], width_ratios = [30, 1], hspace=0.01, wspace=-1.517)
     fig = plt.gcf()
     # Plot the heatmap
     ax_heatmap = fig.add_subplot(gs[1,0])
-    ls = least_squares.copy()
+    ls = nse.copy()
     ls = ls.reindex(ls.mean().sort_values().index,axis=1)
     ls = ls.transpose()
     # Reset index to make indentification easier
@@ -182,7 +182,7 @@ def heatmap_ls(least_squares):
 
     cbar = ax_heatmap.collections[0].colorbar
     # here set the labelsize by 20
-    cbar.ax.set_ylabel("Mean Least Squares [/]", alpha=0.7)
+    cbar.ax.set_ylabel("NSE [/]", alpha=0.7)
     plt.setp(cbar.ax.get_yticklabels(), alpha=0.7)
     cbar.ax.tick_params(color="lightgrey")
     # Calculate the averages for the bar plots
@@ -193,9 +193,12 @@ def heatmap_ls(least_squares):
     # Dummy plot
     ax_bar_top = fig.add_subplot(gs[0,0])
     year_avg.plot.bar(ax=ax_bar_top, facecolor="steelblue",edgecolor="black", linewidth=0.1, zorder=5)
+    ax_bar_top.set_ylim(0,0.8)
     ax_bar_top.get_legend().remove()
     ax_bar_right = fig.add_subplot(gs[1,1])
     catchment_avg.plot.barh(ax=ax_bar_right, facecolor="steelblue",edgecolor="black",linewidth =0.1, zorder=5)
+    ax_bar_right.xaxis.set_ticks(np.arange(0, 0.81, 0.2))
+
     # Remove all borders and stuff
     for ax in [ax_bar_top, ax_bar_right]:
         for spine in ax.spines.values():
@@ -211,14 +214,14 @@ def heatmap_ls(least_squares):
     plt.setp(ax_bar_right.get_yticklabels(), alpha=0)
     plt.setp(ax_bar_right.get_xticklabels(), alpha=0.7) 
     fontsize=10
-    ax_bar_top.set_title("Yearly Mean of the Mean Least Squares [/]", alpha=0.7, fontsize=fontsize)      
-    ax_bar_right.set_ylabel("Catchment Mean of the Mean Least Squares [/]", alpha=0.7, labelpad=-120, rotation=270, fontsize=fontsize)
+    ax_bar_top.set_title("Yearly Mean of the NSE [/]", alpha=0.7, fontsize=fontsize)      
+    ax_bar_right.set_ylabel("Catchment Mean of the NSE [/]", alpha=0.7, labelpad=-120, rotation=270, fontsize=fontsize)
 
     for tick in ax_bar_right.get_xticklabels():
         tick.set_rotation(90)     
     # Adjust top plot finely grained
     
-    ax_bar_top.set_position([0.618,0.69, 0.175, 0.1])
+    ax_bar_top.set_position([0.621,0.69, 0.175, 0.1])
     # Finishing touches    
     fig = plt.gcf()
     fig.set_size_inches(15,15)
@@ -243,7 +246,7 @@ if __name__ == "__main__":
 
         ], axis=1)
    years = ccdt.get_attributes_years()
-   least_squares = pd.read_csv("least_square_all_catchments.csv", sep=";", index_col=0)
-   del(least_squares["41510205"])
-   heatmap_ls(least_squares)
-   scatter_swarm_lse_all_only_catchments(catchments, least_squares)
+   nse = pd.read_csv("nse_all_catchments.csv", sep=";", index_col=0)
+   del(nse["41510205"])
+   heatmap_ls(nse)
+   scatter_swarm_lse_all_only_catchments(catchments, nse)

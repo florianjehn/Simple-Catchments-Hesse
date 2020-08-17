@@ -2,65 +2,65 @@ gauge;gauge_id;durchl‰ssigkeit_huek250;dominating_soil_type_bk500;gesteinsart_hu
 Fahrenbach;23940359;gering bis aeuﬂerst gering (<1E-5);Dystric Cambisols ;Magmatit;Grassland;44237325.79;159.3705196;8.885737439;10.41319598;1912527056;11552.23438
 Lorsch;23942300;gering bis aeuﬂerst gering (<1E-5);Dystric Cambisols ;Magmatit;Agriculture;398508525.9;156.1433693;11.81763872;7.363267866;5845690648;47054.35938
 Eberstadt;23960709;gering bis aeuﬂerst gering (<1E-5);Dystric Cambisols ;Magmatit;Grassland;85976162.04;135.216469;11.36124177;6.929924943;2694729117;29002.6875
-Nauheim;23980353;mittel (>1E-4 - 1E-3);Dystric Cambisols;Sediment;Wood;175233651.2;135.6589577;14.31120219;0.796493872;3808141498;31934.53906
-Jossa-neu;24480695;gering (>1E-7 - 1E-5);Dystric Cambisols;Sediment;Wood;146814783.2;180.8141143;5.09591268;8.362359394;2916946859;33004.83984
-Michelstadt;24740606;gering (>1E-7 - 1E-5);Dystric Cambisols;Sediment;Wood;130999403.1;192.1677626;10.75419599;8.992949144;2942557990;26185.63672
-Gross-Bieberau 2;24761005;gering bis aeuﬂerst gering (<1E-5);Dystric Cambisols ;Magmatit;Wood;35556338.91;134.1003178;8.557803468;8.877438228;1451294839;10659.6875
+Nauheim;23980353;mittel (>1E-4 - 1E-3);Dystric Cambisols;Sediment;Forest;175233651.2;135.6589577;14.31120219;0.796493872;3808141498;31934.53906
+Jossa-neu;24480695;gering (>1E-7 - 1E-5);Dystric Cambisols;Sediment;Forest;146814783.2;180.8141143;5.09591268;8.362359394;2916946859;33004.83984
+Michelstadt;24740606;gering (>1E-7 - 1E-5);Dystric Cambisols;Sediment;Forest;130999403.1;192.1677626;10.75419599;8.992949144;2942557990;26185.63672
+Gross-Bieberau 2;24761005;gering bis aeuﬂerst gering (<1E-5);Dystric Cambisols ;Magmatit;Forest;35556338.91;134.1003178;8.557803468;8.877438228;1451294839;10659.6875
 Harreshausen;24762653;gering bis aeuﬂerst gering (<1E-5);Dystric Cambisols ;Magmatit;Agriculture;464816802.7;139.3128751;13.01672833;4.85554938;6221236656;55653.15625
 Steinau;24780757;gering (>1E-7 - 1E-5);Eutric Cambisols / Stagnic Gleysols ;Sediment;Grassland;116167685.9;132.8361812;8.330118233;7.014308549;2371492129;20289.76367
 Bad Soden;24781909;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols;Magmatit;Grassland;89330138.33;177.0199651;9.508580343;4.754175875;2862161547;29081.50781
 Kassel;24783358;gering (>1E-7 - 1E-5);Dystric Cambisols;Sediment;Grassland;79800397.81;172.2754707;8.444158076;10.57861597;1869000212;16734.9707
 Gelnhausen;24783450;mittel bis maessig (>1E-5 - 1E-3);Dystric Cambisols;Magmatit;Grassland;673245560.9;161.6062826;9.541140248;6.969149898;6875632979;52865.82031
 Hanau;24784259;mittel bis maessig (>1E-5 - 1E-3);Dystric Cambisols;Magmatit;Grassland;927760580.9;153.6674509;10.74643336;6.240524954;8993625293;77836.99219
-Schotten 1;24810155;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols / Stagnic Gleysols;Magmatit;Wood;27071501.72;231.8215708;6.325675676;6.888010124;1161058466;12589.38867
+Schotten 1;24810155;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols / Stagnic Gleysols;Magmatit;Forest;27071501.72;231.8215708;6.325675676;6.888010124;1161058466;12589.38867
 Schotten 2;24810202;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols / Stagnic Gleysols;Magmatit;Grassland;5905481.555;169.0653168;7.994252874;6.84733461;607603711.5;5864.405273
 Eichelsachsen;24810359;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols / Stagnic Gleysols;Magmatit;Grassland;23848554.29;210.7304781;6.964179104;6.370580843;1173892758;12355.0752
 Unter-Schmitten;24810600;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols;Magmatit;Grassland;126835222.3;159.8743092;9.50653038;6.461846835;2542707204;22828.47656
-Ruppertsburg;24820206;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols;Magmatit;Wood;29459574.85;119.8495537;11.28571429;6.728105544;1676468840;18136.63086
+Ruppertsburg;24820206;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols;Magmatit;Forest;29459574.85;119.8495537;11.28571429;6.728105544;1676468840;18136.63086
 Nieder-Florstadt;24830050;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols;Magmatit;Agriculture;526176609.6;108.1177989;14.58822303;4.25052432;4882432096;48431.5625
-Muenster;24840407;mittel bis maessig (>1E-5 - 1E-3);Haplic Luvisols / Eutric Podzoluvisols / Stagnic Gleysols ;Magmatit;Wood;85924303.5;117.0732379;16.15784909;4.391654699;2695770525;16220.16699
-Muschenheim;24840600;mittel bis maessig (>1E-5 - 1E-3);Haplic Luvisols / Eutric Podzoluvisols / Stagnic Gleysols ;Magmatit;Wood;175930568.4;98.96364427;14.96506734;3.472825295;4316856168;32109.44336
-Kransberg;24840950;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Wood;85469446.01;72.3468097;7.806632214;5.488093445;2293003480;14810.46387
+Muenster;24840407;mittel bis maessig (>1E-5 - 1E-3);Haplic Luvisols / Eutric Podzoluvisols / Stagnic Gleysols ;Magmatit;Forest;85924303.5;117.0732379;16.15784909;4.391654699;2695770525;16220.16699
+Muschenheim;24840600;mittel bis maessig (>1E-5 - 1E-3);Haplic Luvisols / Eutric Podzoluvisols / Stagnic Gleysols ;Magmatit;Forest;175930568.4;98.96364427;14.96506734;3.472825295;4316856168;32109.44336
+Kransberg;24840950;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Forest;85469446.01;72.3468097;7.806632214;5.488093445;2293003480;14810.46387
 Friedberg;24841206;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Agriculture;183595925.3;68.82705526;8.747474747;5.071132744;3296770430;34911.63281
 Bruchenbruecken;24841250;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols;Magmatit;Agriculture;513983970.3;77.4688725;13.50482482;3.870269244;7709567971;64987.96875
 Ilbenstadt;24850058;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols;Magmatit;Agriculture;1073589952;92.74450218;14.20226008;4.003328862;8046993129;70286.77344
 Steinberg;24860109;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols;Magmatit;Grassland;24585214.22;234.951345;6.298076923;6.271141276;1537563179;17596.03906
-Glauberg;24860754;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols;Magmatit;Wood;153986007.3;162.7768209;7.281924883;5.94316221;3272957775;35545.24219
-Buedingen;24861054;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols / Stagnic Gleysols;Magmatit;Wood;93689112.67;150.3966799;8.560046189;6.267330411;3034839307;29926.70508
+Glauberg;24860754;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols;Magmatit;Forest;153986007.3;162.7768209;7.281924883;5.94316221;3272957775;35545.24219
+Buedingen;24861054;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols / Stagnic Gleysols;Magmatit;Forest;93689112.67;150.3966799;8.560046189;6.267330411;3034839307;29926.70508
 Windecken;24861407;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols;Magmatit;Agriculture;392467674.3;136.1665177;10.34535987;5.188275934;5737602727;55221.30078
 Bad Vilbel;24870055;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols;Magmatit;Agriculture;1621061595;103.2858027;13.63401564;4.121316331;9921596443;87180.33594
-Ober-Erlenbach;24880208;gering bis aeuﬂerst gering (<1E-5);Dystric Cambisols;Sediment;Wood;71204999.84;97.19779064;9.449776786;4.402591683;2343394797;25205.04688
-Eppstein;24960307;gering bis aeuﬂerst gering (<1E-5);Dystric Cambisols;Sediment;Wood;110368185.8;75.80231488;6.034208708;8.149484907;2061215309;17265.84961
-Martinsthal;25140058;maessig (>1E-5 - 1E-4);Dystric Cambisols;Sediment;Wood;24443981.98;73.98339065;7.096825397;9.735644055;1046683360;11150.57227
-Pfaffental;25650156;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Wood;170127503;49.07518498;4.612370724;12.32602125;3294371331;25561.02734
+Ober-Erlenbach;24880208;gering bis aeuﬂerst gering (<1E-5);Dystric Cambisols;Sediment;Forest;71204999.84;97.19779064;9.449776786;4.402591683;2343394797;25205.04688
+Eppstein;24960307;gering bis aeuﬂerst gering (<1E-5);Dystric Cambisols;Sediment;Forest;110368185.8;75.80231488;6.034208708;8.149484907;2061215309;17265.84961
+Martinsthal;25140058;maessig (>1E-5 - 1E-4);Dystric Cambisols;Sediment;Forest;24443981.98;73.98339065;7.096825397;9.735644055;1046683360;11150.57227
+Pfaffental;25650156;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Forest;170127503;49.07518498;4.612370724;12.32602125;3294371331;25561.02734
 Breidenbach;25810354;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Grassland;93113358.99;142.3355505;6.766747377;8.486858385;2825977486;18880.0625
-Biedenkopf;25810558;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Wood;304328932;151.6636034;5.955147059;11.24475403;4901293523;33282.00391
-Niederwetter;25811255;maessig bis gering (>1E-6 - 1E-4);Dystric Cambisols;Sediment;Wood;173759726.4;103.7084927;8.175740592;6.981304127;3678553282;26703.2793
+Biedenkopf;25810558;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Forest;304328932;151.6636034;5.955147059;11.24475403;4901293523;33282.00391
+Niederwetter;25811255;maessig bis gering (>1E-6 - 1E-4);Dystric Cambisols;Sediment;Forest;173759726.4;103.7084927;8.175740592;6.981304127;3678553282;26703.2793
 Ober-Ofleiden;25821259;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols;Magmatit;Grassland;317045302.3;155.6391089;11.73980978;5.083636059;4192506194;40790.54297
-Gemuenden;25822251;gering (>1E-7 - 1E-5);Dystric Cambisols;Sediment;Wood;102180357.1;86.48175099;9.607333333;7.266537226;2284924375;15825.85352
-Bartenhausen;25822659;maessig bis gering (>1E-6 - 1E-4);Dystric Cambisols;Sediment;Wood;274600973.2;93.10042371;9.73496994;6.436942765;4235838983;33609.36328
+Gemuenden;25822251;gering (>1E-7 - 1E-5);Dystric Cambisols;Sediment;Forest;102180357.1;86.48175099;9.607333333;7.266537226;2284924375;15825.85352
+Bartenhausen;25822659;maessig bis gering (>1E-6 - 1E-4);Dystric Cambisols;Sediment;Forest;274600973.2;93.10042371;9.73496994;6.436942765;4235838983;33609.36328
 Hainmuehle;25822808;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols;Magmatit;Grassland;916625680.9;120.0241218;12.29109456;4.810363078;8795492648;63173.73828
 Marburg;25830056;mittel bis maessig (>1E-5 - 1E-3);Spodic Cambisols;Magmatit;Grassland;1667126250;120.8935801;9.995359779;6.70032915;14082648870;79422.13281
-Etzelmuehle;25831059;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Wood;81138019.65;97.42708482;10.04343891;7.916689824;2461137999;19631.5332
-Lollar;25831605;mittel bis maessig (>1E-5 - 1E-3);Haplic Luvisols / Eutric Podzoluvisols / Stagnic Gleysols ;Magmatit;Wood;128922646.8;111.8720309;15.30194986;4.13930135;3401987660;31207.19336
-Oberkleen;25832357;gering bis aeuﬂerst gering (<1E-5);Dystric Cambisols;Sediment;Wood;23588380.87;62.41141769;5.306990881;6.798906877;1134341312;10234.59277
-Haiger;25840253;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Wood;63082970.3;154.0801229;4.995505618;9.418367131;1955640514;14899.68457
-Dillenburg 2;25840650;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Wood;81925634.41;141.9477012;6.483318305;10.32464155;2722057147;22592.5
-Dillenburg 1;25840708;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Wood;251080592.1;164.8472829;5.69997022;8.488668015;4491371772;25410.73047
-Herbornseelbach;25841507;sehr gering (>1E-9 - 1E-7);Spodic Cambisols;Sediment;Wood;134545186.3;95.53409756;6.846987315;7.83639947;3813932039;23194.85938
-Asslar;25842500;maessig (>1E-5 - 1E-4);Eutric Cambisols;Magmatit;Wood;693990399.9;134.9533504;5.82442421;8.361496739;7343273162;55952.03125
-Bonbaden;25850257;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Wood;98413161.08;73.01232496;5.782106782;6.847574863;2505881456;19342.3125
-Rod an der Weil;25860454;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Wood;77929172.02;100.4810425;5.034132841;9.987016275;2248603473;22766.22852
-Essershausen;25860851;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Wood;205843874.3;77.12933577;4.933424377;8.346240857;3938298912;41657.82813
-Niederbrechen;25871756;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Wood;305637296;61.12776345;9.410283688;6.436873665;4107407441;33906.41016
-Michelbach;25880305;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Wood;144318570.4;68.1136582;5.699398798;7.85936414;3017799785;33050.52344
+Etzelmuehle;25831059;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Forest;81138019.65;97.42708482;10.04343891;7.916689824;2461137999;19631.5332
+Lollar;25831605;mittel bis maessig (>1E-5 - 1E-3);Haplic Luvisols / Eutric Podzoluvisols / Stagnic Gleysols ;Magmatit;Forest;128922646.8;111.8720309;15.30194986;4.13930135;3401987660;31207.19336
+Oberkleen;25832357;gering bis aeuﬂerst gering (<1E-5);Dystric Cambisols;Sediment;Forest;23588380.87;62.41141769;5.306990881;6.798906877;1134341312;10234.59277
+Haiger;25840253;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Forest;63082970.3;154.0801229;4.995505618;9.418367131;1955640514;14899.68457
+Dillenburg 2;25840650;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Forest;81925634.41;141.9477012;6.483318305;10.32464155;2722057147;22592.5
+Dillenburg 1;25840708;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Forest;251080592.1;164.8472829;5.69997022;8.488668015;4491371772;25410.73047
+Herbornseelbach;25841507;sehr gering (>1E-9 - 1E-7);Spodic Cambisols;Sediment;Forest;134545186.3;95.53409756;6.846987315;7.83639947;3813932039;23194.85938
+Asslar;25842500;maessig (>1E-5 - 1E-4);Eutric Cambisols;Magmatit;Forest;693990399.9;134.9533504;5.82442421;8.361496739;7343273162;55952.03125
+Bonbaden;25850257;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Forest;98413161.08;73.01232496;5.782106782;6.847574863;2505881456;19342.3125
+Rod an der Weil;25860454;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Forest;77929172.02;100.4810425;5.034132841;9.987016275;2248603473;22766.22852
+Essershausen;25860851;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Forest;205843874.3;77.12933577;4.933424377;8.346240857;3938298912;41657.82813
+Niederbrechen;25871756;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Forest;305637296;61.12776345;9.410283688;6.436873665;4107407441;33906.41016
+Michelbach;25880305;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Forest;144318570.4;68.1136582;5.699398798;7.85936414;3017799785;33050.52344
 Guenthers;41450056;maessig bis gering (>1E-6 - 1E-4);Eutric Cambisols / Stagnic Gleysols;Sediment;Grassland;183039745.6;192.5677016;6.148274478;8.12100368;2899767309;28521.02539
 Philippsthal;41490050;maessig bis gering (>1E-6 - 1E-4);Eutric Cambisols / Stagnic Gleysols;Sediment;Grassland;420286210.1;144.2078459;6.576010101;7.175906231;5299820787;56222.35938
-Heimboldshausen;41510205;gering (>1E-7 - 1E-5);Spodic Cambisol ;Sediment;Wood;2793572842;123.1949598;6.584365024;8.377583903;15336387128;143176.0313
+Heimboldshausen;41510205;gering (>1E-7 - 1E-5);Spodic Cambisol ;Sediment;Forest;2793572842;123.1949598;6.584365024;8.377583903;15336387128;143176.0313
 Bischhausen;41850054;gering (>1E-7 - 1E-5);Dystric Cambisols;Sediment;Grassland;150027507.5;124.8816611;5.547240412;9.241924589;3200725049;24031.32031
 Hoheneiche;41860900;stark variabel;Dystric Cambisols;Sediment;Grassland;224478203.2;107.4049074;7.659597523;8.383041921;3647666487;21298.29297
 Niddawitzhausen;41890059;gering (>1E-7 - 1E-5);Dystric Cambisols;Sediment;Agriculture;429549623.4;113.6895525;7.111987638;8.669471217;5195846160;31622.58008
-Ziegenhagen 1;41980355;gering (>1E-7 - 1E-5);Dystric Cambisols;Sediment;Wood;14248082.6;158.1433073;5.944174757;14.16224443;687442135.6;6498.719727
+Ziegenhagen 1;41980355;gering (>1E-7 - 1E-5);Dystric Cambisols;Sediment;Forest;14248082.6;158.1433073;5.944174757;14.16224443;687442135.6;6498.719727
 Hettenhausen;42110304;maessig bis gering (>1E-6 - 1E-4);Eutric Cambisols / Stagnic Gleysols;Sediment;Grassland;54682716.16;212.451112;5.910326087;9.924622588;1875271088;16241.9375
 Kerzell;42250256;maessig bis gering (>1E-6 - 1E-4);Dystric Cambisols;Sediment;Grassland;190004668.3;161.6828782;6.444528875;5.196892638;3061505254;25188.48242
 Rothemann;42260250;maessig bis gering (>1E-6 - 1E-4);Dystric Cambisols;Sediment;Grassland;69604266.21;167.7079243;5.655521783;7.230735029;1892197074;17109.17773
@@ -68,24 +68,24 @@ Kaemmerzell;42350057;maessig bis gering (>1E-6 - 1E-4);Dystric Cambisols;Sedimen
 Luetterz;42360550;mittel bis maessig (>1E-5 - 1E-3);Dystric Cambisols;Magmatit;Grassland;181803646.7;159.2762028;7.966378293;5.146404096;3270194333;35918.02344
 Schlechtenwegen;42410104;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols / Stagnic Gleysols;Magmatit;Grassland;41257054.65;254.7066681;8.785542169;4.534702206;1313182799;15542.52539
 Bad Salzschlirf;42430156;mittel bis maessig (>1E-5 - 1E-3);Eutric Cambisols / Stagnic Gleysols;Magmatit;Grassland;135000903.8;190.9749399;9.381276151;4.945642458;2622423027;32531.20898
-Niederjossa;42540358;maessig bis gering (>1E-6 - 1E-4);Dystric Cambisols;Sediment;Wood;113264041;96.76423117;6.453565009;6.604142815;2687698602;21887.89063
-Kirchheim;42560300;maessig bis gering (>1E-6 - 1E-4);Dystric Cambisols;Sediment;Wood;72111641.01;95.6674245;5.464074803;8.013969299;1877099858;16839.58008
+Niederjossa;42540358;maessig bis gering (>1E-6 - 1E-4);Dystric Cambisols;Sediment;Forest;113264041;96.76423117;6.453565009;6.604142815;2687698602;21887.89063
+Kirchheim;42560300;maessig bis gering (>1E-6 - 1E-4);Dystric Cambisols;Sediment;Forest;72111641.01;95.6674245;5.464074803;8.013969299;1877099858;16839.58008
 Bad Hersfeld 2;42590301;maessig bis gering (>1E-6 - 1E-4);Dystric Cambisols;Sediment;Grassland;74883490.39;97.04569356;5.356227106;9.191873475;2246784182;21658.29102
 Melzdorf;42650050;maessig (>1E-5 - 1E-4);Dystric Cambisols;Sediment;Grassland;107493569.1;132.3166907;9.237046632;5.267156524;2344923102;18293.79102
 Silges;42660451;maessig (>1E-5 - 1E-4);Dystric Cambisols;Sediment;Grassland;78842631.97;122.478569;6.24340949;7.191700725;1651994249;17352.71484
 Hermannspiegel;42670557;maessig bis gering (>1E-6 - 1E-4);Dystric Cambisols;Sediment;Grassland;421960498.4;109.4330524;8.613761468;5.765218415;5180407586;56806.93359
 Bad Hersfeld 1;42710050;maessig bis gering (>1E-6 - 1E-4);Dystric Cambisols;Sediment;Grassland;2120724498;128.8769722;7.699952618;6.220881611;10567914319;94924.3125
 Adelshausen;42780500;gering (>1E-7 - 1E-5);Dystric Cambisols;Sediment;Grassland;116131615.2;112.135869;5.274001193;8.89779362;2635961436;24117.70117
-Auhammer;42810204;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Wood;489601265.1;184.2041657;5.299180328;10.67782665;6276424002;73292.97656
+Auhammer;42810204;gering bis aeuﬂerst gering (<1E-5);Spodic Cambisols;Sediment;Forest;489601265.1;184.2041657;5.299180328;10.67782665;6276424002;73292.97656
 Dalwigksthal;42840453;sehr gering (>1E-9 - 1E-7);Spodic Cambisols;Sediment;Grassland;228808523.9;120.9928835;5.439147762;9.37533867;4418981571;31754.64453
 Alsfeld;42880458;mittel bis maessig (>1E-5 - 1E-3);Haplic Luvisols / Eutric Podzoluvisols / Stagnic Gleysols ;Magmatit;Grassland;131493849.4;137.6134082;16.44116037;4.265928572;2791429376;23858.77734
 Roellshausen;42880800;mittel bis maessig (>1E-5 - 1E-3);Haplic Luvisols / Eutric Podzoluvisols / Stagnic Gleysols ;Magmatit;Agriculture;250847712.7;117.8271486;14.33662528;4.250890087;4459443552;37637.34375
 Gungelshausen;42881100;mittel bis maessig (>1E-5 - 1E-3);Haplic Luvisols / Eutric Podzoluvisols / Stagnic Gleysols ;Magmatit;Grassland;113893924.4;122.487298;15.71009674;4.006811037;3348099981;36780.29688
 Uttershausen;42882806;mittel bis maessig (>1E-5 - 1E-3);Spodic Cambisols;Magmatit;Agriculture;987011232.5;101.0512745;12.6488061;4.7228076;8751078725;87727.20313
 Hebel;42883558;maessig bis gering (>1E-6 - 1E-4);Haplic Luvisols / Eutric Podzoluvisols / Stagnic Gleysols ;Sediment;Agriculture;218413824.8;114.6279704;13.05829523;5.73419153;3241287674;34628.29688
-Helsa;42960105;maessig bis gering (>1E-6 - 1E-4);Dystric Cambisols;Sediment;Wood;53946669.49;174.5791151;5.12767475;6.444463578;1852127900;13529.98047
+Helsa;42960105;maessig bis gering (>1E-6 - 1E-4);Dystric Cambisols;Sediment;Forest;53946669.49;174.5791151;5.12767475;6.444463578;1852127900;13529.98047
 Braunsen;44430055;gering (>1E-7 - 1E-5);Dystric Cambisols;Sediment;Agriculture;116897497.8;92.65154952;8.102266124;7.234284757;2538500982;19421.82813
 Ehringen;44480552;gering bis aeuﬂerst gering (<1E-5);Eutric Cambisols;Sediment;Agriculture;137732074.5;79.97587456;10.34081527;4.860730553;2575795684;20689.07031
-Hofgeismar;44840308;maessig (>1E-5 - 1E-4);Dystric Cambisols;Sediment;Wood;49215850.52;142.0852437;8.062942008;3.936318697;1331263155;15925.26367
+Hofgeismar;44840308;maessig (>1E-5 - 1E-4);Dystric Cambisols;Sediment;Forest;49215850.52;142.0852437;8.062942008;3.936318697;1331263155;15925.26367
 Huemme;44850108;gering bis aeuﬂerst gering (<1E-5);Eutric Cambisols / Stagnic Gleysols ;Sediment;Agriculture;187691725;103.2484729;11.71453287;3.623522742;2625717382;30719.15234
 Helmarshausen;44950055;maessig bis gering (>1E-6 - 1E-4);Haplic Luvisols / Eutric Podzoluvisols / Stagnic Gleysols ;Sediment;Agriculture;1757395999;106.5957536;10.53360003;5.988134425;10630505543;114308.5625
