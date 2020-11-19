@@ -2,7 +2,7 @@ import pandas as pd
 import os
 home = os.path.dirname(__file__) 
 
-def get_table_dict(calc_water_year=True, et_corrected=False):
+def get_table_dict(calc_water_year=True, et_corrected=True):
     """
     Loads the csv data and return a dict with catchment id as key and a dataframe as value
     """
@@ -13,7 +13,7 @@ def get_table_dict(calc_water_year=True, et_corrected=False):
     else:
         matE = pd.read_csv(home + os.sep + 'et_mm_1991_2018_uncorrected.csv', delimiter=';', parse_dates=[0], index_col=0, dayfirst=True)
     matP = pd.read_csv(home + os.sep + 'prec_mm_1991_2018.csv', delimiter=';', parse_dates=[0], index_col=0, dayfirst=True)
-
+    matdS = pd.read_csv(home + os.sep + 'dS_mm_1991_2018.csv', delimiter=';', parse_dates=[0], index_col=0, dayfirst=True)
 
     dataframes = {}
 
@@ -22,6 +22,7 @@ def get_table_dict(calc_water_year=True, et_corrected=False):
         df['Q'] = matQ[catch]
         df['E'] = matE[catch]
         df['P'] = matP[catch]
+        df["dS"] = matdS[catch]
         if calc_water_year:
             water_year(df)
         dataframes[int(catch)] = df

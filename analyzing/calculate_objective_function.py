@@ -25,40 +25,43 @@ def find_all_exp(dataframes:dict, water_year=True):
     obj_func_all_catchments = pd.DataFrame(columns=list(dataframes.keys()), index=[year for year in range(1991, 2019)])
     for catch in dataframes.keys():
         df = dataframes[catch]
-        grouped_years = df.groupby("water_year") if water_year else df.groupby(df.index.year)
+        if water_year:
+            grouped_years = df.groupby("water_year")
+        else:
+            grouped_years = df.groupby(df.index.year)
         for year, year_df in grouped_years:
             if water_year:    
                 # Skip half empty water years
                 if year == 1991 or year == 2019:
                     continue
-                # Calculate cummulative storage change
-                year_df["cdS"] = np.cumsum(year_df.loc[:,"dS"])
-                # Only use days without rain
-                year_df = year_df[year_df["P"] == 0]
-                # Check for nan
-                if year_df.isnull().any().any():
-                    print("\nhas nan")
-                    print(catch)
-                    print(year)
-                    continue
-                # Find the parameters
-                x = normalize(year_df["cdS"])
-                y = normalize(year_df["Q"])
-                try:
-                    optimal_parameters = find_exponential_function(x,y)
-                except RuntimeError as err:
-                    print("\n")
-                    print(catch)
-                    print(year)
-                    print(err)
-                    continue
-                parameters_all_catchments.loc[year,catch] = optimal_parameters
-                
-                # Calculate the objective function to compare the real and the
-                # simulated values. 
-                y_sim = exponential(x, *optimal_parameters)
-                obj_func = kge_non_parametric(y, y_sim)
-                obj_func_all_catchments.loc[year,catch] = obj_func
+            # Calculate cummulative storage change
+            year_df["cdS"] = np.cumsum(year_df.loc[:,"dS"])
+            # Only use days without rain
+            year_df = year_df[year_df["P"] == 0]
+            # Check for nan
+            if year_df.isnull().any().any():
+                print("\nhas nan")
+                print(catch)
+                print(year)
+                continue
+            # Find the parameters
+            x = normalize(year_df["cdS"])
+            y = normalize(year_df["Q"])
+            try:
+                optimal_parameters = find_exponential_function(x,y)
+            except RuntimeError as err:
+                print("\n")
+                print(catch)
+                print(year)
+                print(err)
+                continue
+            parameters_all_catchments.loc[year,catch] = optimal_parameters
+            
+            # Calculate the objective function to compare the real and the
+            # simulated values. 
+            y_sim = exponential(x, *optimal_parameters)
+            obj_func = kge_non_parametric(y, y_sim)
+            obj_func_all_catchments.loc[year,catch] = obj_func
         print("Finished: ")
         print(catch)
 
@@ -74,7 +77,7 @@ def find_exponential_function(x,y):
 def _spearmann_corr(x, y):
     """
     Separmann correlation coefficient
-    This is from the SPOTPY package:
+    This code is from the SPOTPY package:
         https://github.com/thouska/spotpy
     """
     col = [list(a) for a in zip(x, y)]
@@ -163,7 +166,6 @@ def normalize(series:pd.Series):
 if __name__ == '__main__':
 
     import preprocessing.cleaned_data.create_cleaned_data_table as ccdt
-    import preprocessing.reformat_data.et_correction as et_cor
     in_dfs = ccdt.get_table_dict(calc_water_year=True)
     dataframes = {}
     for catch in list(in_dfs.keys())[:]:
@@ -172,8 +174,6 @@ if __name__ == '__main__':
             print("Skipped: " + str(catch))
             continue
         dataframes[catch] = in_dfs[catch]
-    et_cor.correct_and_save_ET(dataframes)
-    calculate_dS(dataframes)
     
     parameters_all_catchments, obj_func_all_catchments = find_all_exp(dataframes, water_year=True)
 #    Remove empty year 1991

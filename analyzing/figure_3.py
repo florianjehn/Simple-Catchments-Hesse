@@ -19,13 +19,14 @@ def plot_Q_vs_cumdS_scatter(dataframes, water_year=True):
     Plots Q vs cumdS for seperated by year and river
     """
     import matplotlib
+    # Agg stops matplotlib from opening a new window every time
     matplotlib.use('Agg')
     for catch in dataframes.keys():
         df = dataframes[catch]
         if water_year:
             grouped_years = df.groupby("water_year")
         else:
-            df.groupby(df.index.year)
+            grouped_years = df.groupby(df.index.year)
         for year, year_df in grouped_years:
             # Skip half empty water years
             if water_year and (year == 1991 or year == 2019):
@@ -74,9 +75,9 @@ def calculate_dS(dataframes:dict):
         
 
 if __name__ == '__main__':
-
+    # This creates all the Q vs. dS plots. Figure 3 is made from a selection
+    # of them by hand. 
     import preprocessing.cleaned_data.create_cleaned_data_table as ccdt
-    import preprocessing.reformat_data.et_correction as et_cor
     in_dfs = ccdt.get_table_dict(calc_water_year=True)
     dataframes = {}
     for catch in list(in_dfs.keys())[:]:
@@ -85,10 +86,9 @@ if __name__ == '__main__':
             print("Skipped: " + str(catch))
             continue
         dataframes[catch] = in_dfs[catch]
-    et_cor.correct_and_save_ET(dataframes)
-    calculate_dS(dataframes)
+
     
-    plot_Q_vs_cumdS_scatter(dataframes, water_year=True)
+ #   plot_Q_vs_cumdS_scatter(dataframes, water_year=True)
 
        
 
