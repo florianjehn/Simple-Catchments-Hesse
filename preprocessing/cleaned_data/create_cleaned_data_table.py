@@ -2,7 +2,7 @@ import pandas as pd
 import os
 home = os.path.dirname(__file__) 
 
-def get_table_dict(calc_water_year=False, et_corrected=False):
+def get_table_dict(calc_water_year=True, et_corrected=False):
     """
     Loads the csv data and return a dict with catchment id as key and a dataframe as value
     """

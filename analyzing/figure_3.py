@@ -17,7 +17,7 @@ import math
 from scipy.optimize import curve_fit
 
 
-def plot_Q_vs_cumdS_scatter(dataframes, water_year=False):
+def plot_Q_vs_cumdS_scatter(dataframes, water_year=True):
     """
     Plots Q vs cumdS for seperated by year and river
     """
@@ -60,7 +60,7 @@ def plot_Q_vs_cumdS_scatter(dataframes, water_year=False):
             plt.savefig("q_vs_dS/"+ str(catch) + "_" + str(year) + "_no_rain.png", dpi=150, bbox_inches="tight")
             plt.close()
             
-def plot_Q_vs_cumdS_line(dataframes, water_year=False):
+def plot_Q_vs_cumdS_line(dataframes, water_year=True):
     """
     Plots Q vs cumdS for seperated by year and river
     """
@@ -93,7 +93,7 @@ def plot_Q_vs_cumdS_line(dataframes, water_year=False):
             plt.close()
             
                
-def find_all_exp(dataframes:dict, water_year=False):        
+def find_all_exp(dataframes:dict, water_year=True):        
     """
     Finds the parameters for the function y = c * e ** (k * x) for all catchments
     and how much the values for the catchments differ from this function in every
