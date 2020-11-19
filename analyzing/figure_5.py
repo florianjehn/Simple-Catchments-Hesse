@@ -13,7 +13,7 @@ sys.path.append(os.sep.join(file_dir.split(os.sep)[:-1]))
 
             
     
-def scatter_swarm_lse_all_only_catchments(catchments, nse):           
+def scatter_swarm_all_only_catchments(catchments, obj_func):           
     """
     Plots the scatter and violin plots only for the catchments
     
@@ -33,20 +33,20 @@ def scatter_swarm_lse_all_only_catchments(catchments, nse):
         print(attribute)
         if attribute == "gauge":
             continue
-        iterate = nse.columns
+        iterate = obj_func.columns
         collect = []
         for single_catch in iterate:
             # Skip catchments with much missing or stepwise data
             if single_catch in ["23950104", "24781159", "24781206", "428832990", "42870057"]:
                 print("Skipped: " + str(single_catch))
                 continue
-            nse_single = nse.loc[:,single_catch]
-            nse_single.name = "catchment_nse"
+            obj_func_single = obj_func.loc[:,single_catch]
+            obj_func_single.name = "catchment_obj_func"
             current_catch_att = catchments.loc[ int(single_catch), attribute]
             # Make attribute as long as the least squares
-            current_catch_att = pd.Series([current_catch_att] * len(nse_single), index=nse_single.index)
+            current_catch_att = pd.Series([current_catch_att] * len(obj_func_single), index=obj_func_single.index)
             current_catch_att.name=attribute
-            combined = pd.concat([nse_single, pd.Series(current_catch_att)],axis=1)
+            combined = pd.concat([obj_func_single, pd.Series(current_catch_att)],axis=1)
             collect.append(combined)
         all_data_attribute = pd.concat(collect,ignore_index=True)
 
@@ -54,10 +54,10 @@ def scatter_swarm_lse_all_only_catchments(catchments, nse):
         bonferoni_p_val_correction = 24
         if all_data_attribute[attribute].dtype != float:
             ax = plt.Subplot(fig, cat_grid[i])
-            sns.swarmplot(y="catchment_nse", data=all_data_attribute, x=attribute,ax=ax, color="steelblue", zorder=5, size=0.8)
-            sns.boxplot(y="catchment_nse", data=all_data_attribute, x=attribute, showcaps=False,boxprops={'facecolor':'None', "edgecolor":"grey", "zorder":5,'linewidth':2},
+            sns.swarmplot(y="catchment_obj_func", data=all_data_attribute, x=attribute,ax=ax, color="steelblue", zorder=5, size=0.8)
+            sns.boxplot(y="catchment_obj_func", data=all_data_attribute, x=attribute, showcaps=False,boxprops={'facecolor':'None', "edgecolor":"grey", "zorder":5,'linewidth':2},
                                                 showfliers=False,whiskerprops={'linewidth':0,}, ax=ax, zorder=5, width=0.4)
-            values_per_group = [col.dropna() for col_name, col in all_data_attribute.groupby(attribute)["catchment_nse"]]
+            values_per_group = [col.dropna() for col_name, col in all_data_attribute.groupby(attribute)["catchment_obj_func"]]
 
             statistic, pval = scipy.stats.f_oneway(*values_per_group)
             for tick in ax.get_xticklabels():
@@ -76,7 +76,7 @@ def scatter_swarm_lse_all_only_catchments(catchments, nse):
             
             ax = plt.Subplot(fig, num_grid[j])
             x = all_data_attribute[attribute].astype(float)
-            y = all_data_attribute["catchment_nse"]
+            y = all_data_attribute["catchment_obj_func"]
             xy = pd.concat([x,y],axis=1)
             xy.dropna(inplace=True)
             results = scipy.stats.linregress(xy)           
@@ -90,7 +90,7 @@ def scatter_swarm_lse_all_only_catchments(catchments, nse):
             pval = 1 if pval > 1 else pval
             ax.set_title("Regression Trend P-Value: " + str(round(pval,3)),alpha=0.7)
             j += 1
-        ax.set_ylabel("NSE [/]",alpha=.7) 
+        ax.set_ylabel("obj_func [/]",alpha=.7) 
         # Make nicer
         plt.setp(ax.get_yticklabels(), alpha=0.7)
         plt.setp(ax.get_xticklabels(), alpha=0.7)
@@ -128,106 +128,7 @@ def scatter_swarm_lse_all_only_catchments(catchments, nse):
     plt.savefig("catchment_regressions_attributes.png", dpi=300, bbox_inches="tight")
     plt.close()
             
-        
-        
-def find_unique_pairs(cats):
-    """ 
-    Finds all unique combinatino of the categories in cats and returns a list
-    of pairs in tuples
-    """
-    unique_pairs = []    
-    for a in cats:
-        for b in cats:
-            if a != b:
-                unique_pairs.append(tuple(sorted((a,b))))
-    return list(set(unique_pairs))
-
-
-def heatmap_ls(nse):
-    """Creats a heatmap of the nse with bar plots on each
-    side to mark the mean """
-    # Create the gridspec
-    gs = gridspec.GridSpec(2,2, height_ratios=[1,3], width_ratios = [30, 1], hspace=0.01, wspace=-1.517)
-    fig = plt.gcf()
-    # Plot the heatmap
-    ax_heatmap = fig.add_subplot(gs[1,0])
-    ls = nse.copy()
-    ls = ls.reindex(ls.mean().sort_values().index,axis=1)
-    ls = ls.transpose()
-    # Reset index to make indentification easier
-    ls = ls.reset_index()
-    ls.index = ls.index + 1
-    del(ls["index"])
-
-    sns.heatmap(ls, square=True, cmap="Blues",  yticklabels=True,
-                     cbar_kws = dict(use_gridspec=False,location="left",shrink= 0.3, pad=0.01), 
-                     ax=ax_heatmap, linecolor="grey", linewidths=0.1)
-    ax_heatmap.set_ylabel("Catchments", alpha=0.7)
-    ax_heatmap.set_xlabel("Years", alpha=0.7)
-    ax_heatmap.tick_params(axis=u'both', which=u'both',length=0)
-    plt.setp(ax_heatmap.get_xticklabels(), alpha=0.7)
-    plt.setp(ax_heatmap.get_yticklabels(), alpha=0.7)
-    
-    # Set the visibility of the ticklabels
-    temp = ax_heatmap.xaxis.get_ticklabels()
-    temp = list(set(temp) - set(temp[1::2]))
-    for label in temp:
-        label.set_visible(False)
-        
-    temp = ax_heatmap.yaxis.get_ticklabels()
-    temp = list(set(temp) - set(temp[1::2]))
-    for label in temp:
-        label.set_visible(False)
-
-
-    cbar = ax_heatmap.collections[0].colorbar
-    # here set the labelsize by 20
-    cbar.ax.set_ylabel("NSE [/]", alpha=0.7)
-    plt.setp(cbar.ax.get_yticklabels(), alpha=0.7)
-    cbar.ax.tick_params(color="lightgrey")
-    # Calculate the averages for the bar plots
-    catchment_avg = ls.mean(axis=1).sort_values(ascending =False)
-    year_avg = pd.DataFrame(ls.mean())
-
-    # Plot the barplots
-    # Dummy plot
-    ax_bar_top = fig.add_subplot(gs[0,0])
-    year_avg.plot.bar(ax=ax_bar_top, facecolor="steelblue",edgecolor="black", linewidth=0.1, zorder=5)
-    ax_bar_top.set_ylim(0,0.8)
-    ax_bar_top.get_legend().remove()
-    ax_bar_right = fig.add_subplot(gs[1,1])
-    catchment_avg.plot.barh(ax=ax_bar_right, facecolor="steelblue",edgecolor="black",linewidth =0.1, zorder=5)
-    ax_bar_right.xaxis.set_ticks(np.arange(0, 0.81, 0.2))
-
-    # Remove all borders and stuff
-    for ax in [ax_bar_top, ax_bar_right]:
-        for spine in ax.spines.values():
-            spine.set_visible(False)
-            plt.setp(ax.get_yticklabels(), alpha=0)
-            plt.setp(ax.get_xticklabels(), alpha=0)
-            ax.tick_params(axis=u'both', which=u'both',length=0)
-   
-    ax_bar_top.yaxis.grid(True, color="lightgrey",zorder=0)
-    ax_bar_right.xaxis.grid(True, color="lightgrey",zorder=0)
-    plt.setp(ax_bar_top.get_yticklabels(), alpha=0.7)
-    plt.setp(ax_bar_top.get_xticklabels(), alpha=0)
-    plt.setp(ax_bar_right.get_yticklabels(), alpha=0)
-    plt.setp(ax_bar_right.get_xticklabels(), alpha=0.7) 
-    fontsize=10
-    ax_bar_top.set_title("Yearly Mean of the NSE [/]", alpha=0.7, fontsize=fontsize)      
-    ax_bar_right.set_ylabel("Catchment Mean of the NSE [/]", alpha=0.7, labelpad=-120, rotation=270, fontsize=fontsize)
-
-    for tick in ax_bar_right.get_xticklabels():
-        tick.set_rotation(90)     
-    # Adjust top plot finely grained
-    
-    ax_bar_top.set_position([0.621,0.69, 0.175, 0.1])
-    # Finishing touches    
-    fig = plt.gcf()
-    fig.set_size_inches(15,15)
-    plt.savefig("heatmap_lse.png", dpi=500, bbox_inches="tight")
-    plt.close()
-    
+ 
     
 
 if __name__ == "__main__":
@@ -246,7 +147,6 @@ if __name__ == "__main__":
 
         ], axis=1)
    years = ccdt.get_attributes_years()
-   nse = pd.read_csv("nse_all_catchments.csv", sep=";", index_col=0)
-   del(nse["41510205"])
-   heatmap_ls(nse)
-   scatter_swarm_lse_all_only_catchments(catchments, nse)
+   obj_func = pd.read_csv("obj_func_all_catchments.csv", sep=";", index_col=0)
+   del(obj_func["41510205"])
+   scatter_swarm_all_only_catchments(catchments, obj_func)
