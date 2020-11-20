@@ -11,23 +11,27 @@ file_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.sep.join(file_dir.split(os.sep)[:-1]))
 
 
-def heatmap_ls(obj_func):
+def heatmap(obj_func):
     """Creats a heatmap of the obj_func with bar plots on each
     side to mark the mean """
     # Create the gridspec
-    gs = gridspec.GridSpec(2,2, height_ratios=[1,3], width_ratios = [30, 1], hspace=0.01, wspace=-1.517)
+    gs = gridspec.GridSpec(2,2, 
+                           height_ratios=[1,3],
+                           width_ratios = [30, 1], 
+                           hspace=0.00, 
+                           wspace=-1.513)
     fig = plt.gcf()
     # Plot the heatmap
     ax_heatmap = fig.add_subplot(gs[1,0])
-    ls = obj_func.copy()
-    ls = ls.reindex(ls.mean().sort_values().index,axis=1)
-    ls = ls.transpose()
+    obj_func = obj_func.copy()
+    obj_func = obj_func.reindex(obj_func.mean().sort_values().index,axis=1)
+    obj_func = obj_func.transpose()
     # Reset index to make indentification easier
-    ls = ls.reset_index()
-    ls.index = ls.index + 1
-    del(ls["index"])
+    obj_func = obj_func.reset_index()
+    obj_func.index = obj_func.index + 1
+    del(obj_func["index"])
 
-    sns.heatmap(ls, square=True, cmap="Blues",  yticklabels=True,
+    sns.heatmap(obj_func, square=True, cmap="Blues",  yticklabels=True,
                      cbar_kws = dict(use_gridspec=False,location="left",shrink= 0.3, pad=0.01), 
                      ax=ax_heatmap, linecolor="grey", linewidths=0.1)
     ax_heatmap.set_ylabel("Catchments", alpha=0.7)
@@ -36,7 +40,7 @@ def heatmap_ls(obj_func):
     plt.setp(ax_heatmap.get_xticklabels(), alpha=0.7)
     plt.setp(ax_heatmap.get_yticklabels(), alpha=0.7)
     
-    # Set the visibility of the ticklabels
+    # Set the visibility of the ticklabeobj_func
     temp = ax_heatmap.xaxis.get_ticklabels()
     temp = list(set(temp) - set(temp[1::2]))
     for label in temp:
@@ -49,13 +53,13 @@ def heatmap_ls(obj_func):
 
 
     cbar = ax_heatmap.collections[0].colorbar
-    # here set the labelsize by 20
-    cbar.ax.set_ylabel("obj_func [/]", alpha=0.7)
+    # here set the labeobj_funcize by 20
+    cbar.ax.set_ylabel("KGE [/]", alpha=0.7)
     plt.setp(cbar.ax.get_yticklabels(), alpha=0.7)
     cbar.ax.tick_params(color="lightgrey")
     # Calculate the averages for the bar plots
-    catchment_avg = ls.mean(axis=1).sort_values(ascending =False)
-    year_avg = pd.DataFrame(ls.mean())
+    catchment_avg = obj_func.mean(axis=1).sort_values(ascending =False)
+    year_avg = pd.DataFrame(obj_func.mean())
 
     # Plot the barplots
     # Dummy plot
@@ -82,8 +86,8 @@ def heatmap_ls(obj_func):
     plt.setp(ax_bar_right.get_yticklabels(), alpha=0)
     plt.setp(ax_bar_right.get_xticklabels(), alpha=0.7) 
     fontsize=10
-    ax_bar_top.set_title("Yearly Mean of the obj_func [/]", alpha=0.7, fontsize=fontsize)      
-    ax_bar_right.set_ylabel("Catchment Mean of the obj_func [/]", alpha=0.7, labelpad=-120, rotation=270, fontsize=fontsize)
+    ax_bar_top.set_title("Yearly Mean of the KGE [/]", alpha=0.7, fontsize=fontsize)      
+    ax_bar_right.set_ylabel("Catchment Mean of the KGE [/]\n", alpha=0.7, labelpad=-120, rotation=270, fontsize=fontsize)
 
     for tick in ax_bar_right.get_xticklabels():
         tick.set_rotation(90)     
@@ -107,7 +111,7 @@ if __name__ == "__main__":
                        'Land Use [/]',
                        # topography
                         'Area [km²]',  'Elongation Ratio [/]','Slope [/]',
-                        # Soils
+                        # Soiobj_func
                         'Soil Depth [m]','Soil Texture [/]','Soil Type [/]', 
                         # Groundwater
                         'Aquifer Conductivity [/]', 'Geology Type [/]', 'Ground Water Recharge [mm]',        'Permeability [/]'
@@ -116,5 +120,4 @@ if __name__ == "__main__":
    years = ccdt.get_attributes_years()
    obj_func = pd.read_csv("obj_func_all_catchments.csv", sep=";", index_col=0)
    del(obj_func["41510205"])
-   heatmap_ls(obj_func)
-   scatter_swarm_lse_all_only_catchments(catchments, obj_func)
+   heatmap(obj_func)

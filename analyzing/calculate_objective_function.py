@@ -60,7 +60,7 @@ def find_all_exp(dataframes:dict, water_year=True):
             # Calculate the objective function to compare the real and the
             # simulated values. 
             y_sim = exponential(x, *optimal_parameters)
-            obj_func = kge_non_parametric(y, y_sim)
+            obj_func = kge(y, y_sim)
             obj_func_all_catchments.loc[year,catch] = obj_func
         print("Finished: ")
         print(catch)
@@ -74,64 +74,25 @@ def find_exponential_function(x,y):
     return optimal_parameters
       
 
-def _spearmann_corr(x, y):
+def kge(evaluation, simulation, return_all=False):
     """
-    Separmann correlation coefficient
-    This code is from the SPOTPY package:
-        https://github.com/thouska/spotpy
-    """
-    col = [list(a) for a in zip(x, y)]
-    xy = sorted(col, key=lambda x: x[0], reverse=False)
-    # rang of x-value
-    for i, row in enumerate(xy):
-        row.append(i+1)
-
-    a = sorted(xy, key=lambda x: x[1], reverse=False)
-    # rang of y-value
-    for i, row in enumerate(a):
-        row.append(i+1)
-
-    MW_rank_x = np.nanmean(np.array(a)[:,2])
-    MW_rank_y = np.nanmean(np.array(a)[:,3])
-
-    numerator = np.nansum([float((a[j][2]-MW_rank_x)*(a[j][3]-MW_rank_y)) for j in range(len(a))])
-    denominator1 = np.sqrt(np.nansum([(a[j][2]-MW_rank_x)**2. for j in range(len(a))]))
-    denominator2 = np.sqrt(np.nansum([(a[j][3]-MW_rank_x)**2. for j in range(len(a))]))
-    return float(numerator/(denominator1*denominator2))
-
-
-def kge_non_parametric(evaluation, simulation, return_all=False):
-    """
-    Non parametric Kling-Gupta Efficiency
-    Corresponding paper:
-    Pool, Vis, and Seibert, 2018 Evaluating model performance: towards a non-parametric variant of the Kling-Gupta efficiency, Hydrological Sciences Journal.
+    Kling-Gupta Efficiency
+    Corresponding paper: 
+    Gupta, Kling, Yilmaz, Martinez, 2009, Decomposition of the mean squared error and NSE performance criteria: Implications for improving hydrological modelling
     output:
         kge: Kling-Gupta Efficiency
-    
-    author: Nadine Maier and Tobias Houska
     optional_output:
         cc: correlation 
         alpha: ratio of the standard deviation
         beta: ratio of the mean
-    This code is from the SPOTPY package:
-        https://github.com/thouska/spotpy
+        
+    THIS FUNCTION IS FROM THE SPOTPY PACKAGE
+    https://github.com/thouska/spotpy/blob/master/spotpy/objectivefunctions.py
     """
     if len(evaluation) == len(simulation):
-        ## self-made formula 
-        cc = _spearmann_corr(evaluation, simulation)
-
-        ### scipy-Version
-        #cc = stm.spearmanr(evaluation, simulation, axis=0)[0]
-
-        ### pandas version 
-        #a  = pd.DataFrame({'eva': evaluation, 'sim': simulation})
-        #cc = a.ix[:,1].corr(a.ix[:,0], method = 'spearman')
-
-        fdc_sim = np.sort(simulation / (np.nanmean(simulation)*len(simulation)))
-        fdc_obs = np.sort(evaluation / (np.nanmean(evaluation)*len(evaluation)))
-        alpha = 1 - 0.5 * np.nanmean(np.abs(fdc_sim - fdc_obs))
- 
-        beta = np.mean(simulation) / np.mean(evaluation)
+        cc = np.corrcoef(evaluation, simulation)[0, 1]
+        alpha = np.std(simulation) / np.std(evaluation)
+        beta = np.sum(simulation) / np.sum(evaluation)
         kge = 1 - np.sqrt((cc - 1)**2 + (alpha - 1)**2 + (beta - 1)**2)
         if return_all:
             return kge, cc, alpha, beta
@@ -140,7 +101,6 @@ def kge_non_parametric(evaluation, simulation, return_all=False):
     else:
         print("evaluation and simulation lists does not have the same length.")
         return np.nan
-    
 
 def exponential(x,c, k):
     """
@@ -170,7 +130,7 @@ if __name__ == '__main__':
     dataframes = {}
     for catch in list(in_dfs.keys())[:]:
         # Skip catchments with much missing or stepwise data
-        if catch in [23950104, 24781159, 24781206, 428832990, 42870057]:
+        if catch in [23950104, 24781159, 24781206, 428832990, 42870057, 23960709]:
             print("Skipped: " + str(catch))
             continue
         dataframes[catch] = in_dfs[catch]

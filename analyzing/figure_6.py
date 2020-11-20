@@ -18,7 +18,7 @@ import matplotlib
 file_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.sep.join(file_dir.split(os.sep)[:-1]))
 
-def plot_differences_catchments_years_by_nse_only_catchments(catchments, nse, amount_homogen):           
+def plot_differences_catchments_years_by_obj_func_only_catchments(catchments, obj_func, amount_homogen):           
     """
     Plots the attributes of the catchments seperated by the most complex and most simple catchments
         """
@@ -31,11 +31,11 @@ def plot_differences_catchments_years_by_nse_only_catchments(catchments, nse, am
     axes = []
 
     # Get the predominant type for every year/catchment
-    mean_nse = nse.mean(axis=0)
+    mean_obj_func = obj_func.mean(axis=0)
         
     # Find the year/catchment that have the highest and lowest least square error
-    complex_catch_year = mean_nse[mean_nse < mean_nse.quantile(amount_homogen)].index.astype(float)
-    simple_catch_year = mean_nse[mean_nse > mean_nse.quantile(1-amount_homogen)].index.astype(float)
+    complex_catch_year = mean_obj_func[mean_obj_func < mean_obj_func.quantile(amount_homogen)].index.astype(float)
+    simple_catch_year = mean_obj_func[mean_obj_func > mean_obj_func.quantile(1-amount_homogen)].index.astype(float)
     most_homogen = {"simple (n=18)": simple_catch_year, "complex (n=18)":complex_catch_year}
         
     # Create a figure for every attribute
@@ -164,9 +164,9 @@ if __name__ == "__main__":
                         'Aquifer Conductivity [/]', 'Geology Type [/]', 'Ground Water Recharge [mm]',        'Permeability [/]'
 
         ], axis=1)
-   nse = pd.read_csv("nse_all_catchments.csv", sep=";", index_col=0)
+   obj_func = pd.read_csv("obj_func_all_catchments.csv", sep=";", index_col=0)
    
    # Exclude non significant attributes
 
    catchments.drop(['Soil Depth [m]'],inplace=True, axis=1)
-   plot_differences_catchments_years_by_nse_only_catchments(catchments, nse, 0.2)
+   plot_differences_catchments_years_by_obj_func_only_catchments(catchments, obj_func, 0.2)
