@@ -90,7 +90,7 @@ def scatter_swarm_all_only_catchments(catchments, obj_func):
             pval = 1 if pval > 1 else pval
             ax.set_title("Regression Trend P-Value: " + str(round(pval,3)),alpha=0.7)
             j += 1
-        ax.set_ylabel("obj_func [/]",alpha=.7) 
+        ax.set_ylabel("KGE [/]",alpha=.7) 
         # Make nicer
         plt.setp(ax.get_yticklabels(), alpha=0.7)
         plt.setp(ax.get_xticklabels(), alpha=0.7)
