@@ -33,7 +33,7 @@ def plot_differences_catchments_years_by_obj_func_only_catchments(catchments, ob
     # Get the predominant type for every year/catchment
     mean_obj_func = obj_func.mean(axis=0)
         
-    # Find the year/catchment that have the highest and lowest least square error
+    # Find the year/catchment that have the highest and lowest objective function
     complex_catch_year = mean_obj_func[mean_obj_func < mean_obj_func.quantile(amount_homogen)].index.astype(float)
     simple_catch_year = mean_obj_func[mean_obj_func > mean_obj_func.quantile(1-amount_homogen)].index.astype(float)
     most_homogen = {"simple (n=18)": simple_catch_year, "complex (n=18)":complex_catch_year}
