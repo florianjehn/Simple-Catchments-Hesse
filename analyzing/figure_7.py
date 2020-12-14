@@ -106,7 +106,10 @@ def plot_differences_catchments_years_by_obj_func_only_catchments(catchments, ob
             bonferoni_p_val_correction = 20
             pval = p_value*bonferoni_p_val_correction
             pval = 1 if pval > 1 else pval
-            ax.set_title(" ANOVA P-Value: " + str(round(pval,3)),alpha=0.7, fontsize=10)
+            pval = str(round(pval,3))
+            if pval == "0.0":
+                pval = "0"
+            ax.set_title(" ANOVA P-Value: " + pval,alpha=0.7, fontsize=10)
             j += 1
             plt.setp(ax.get_xticklabels(), alpha=0.7, fontsize=8)
 
