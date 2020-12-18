@@ -64,10 +64,7 @@ def scatter_swarm_all_only_catchments(catchments, obj_func):
                 tick.set_rotation(90)
             pval = pval*bonferoni_p_val_correction
             pval = 1 if pval > 1 else pval
-            pval = str(round(pval,3))
-            if pval == "0.0":
-                pval = "0"
-            ax.set_title("ANOVA P-Value: " + pval,alpha=0.7)
+            ax.set_title("ANOVA P-Value: " + format_p_val(pval),alpha=0.7, fontsize=10)
             ax.set_xlabel(attribute, alpha=0.7)
             ax.yaxis.grid(True, color="lightgrey")
             if attribute == "Land Use [/]":
@@ -91,10 +88,7 @@ def scatter_swarm_all_only_catchments(catchments, obj_func):
             ax.set_xlim(all_data_attribute[attribute].min(), all_data_attribute[attribute].max())
             pval = results[3]*bonferoni_p_val_correction
             pval = 1 if pval > 1 else pval
-            pval = str(round(pval,3))
-            if pval == "0.0":
-                pval = "0"
-            ax.set_title("Regression Trend P-Value: " + pval,alpha=0.7)
+            ax.set_title("Regression Trend P-Value: " + format_p_val(pval),alpha=0.7, fontsize=10)
             j += 1
         ax.set_ylabel("KGE [/]",alpha=.7) 
         # Make nicer
@@ -135,6 +129,15 @@ def scatter_swarm_all_only_catchments(catchments, obj_func):
     plt.close()
             
  
+def format_p_val(pval):
+    if pval > 0.01:
+        return str(round(pval,3))
+    elif pval < 0.0001:
+        return "< 0.0001"
+    elif pval < 0.001:
+        return "< 0.001"
+    else: 
+        return "< 0.01"
     
 
 if __name__ == "__main__":

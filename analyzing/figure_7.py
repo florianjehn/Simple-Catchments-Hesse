@@ -151,7 +151,18 @@ def plot_differences_catchments_years_by_obj_func_only_catchments(catchments, ob
     plt.savefig("all_together_most_extreme_catch.png", dpi=300,  bbox_inches="tight")
     plt.close()      
 
-        
+      
+def format_p_val(pval):
+    if pval > 0.01:
+        return str(pval)
+    elif pval < 0.0001:
+        return "< 0.0001"
+    elif pval < 0.001:
+        return "< 0.001"
+    else: 
+        return "< 0.01"
+    
+    
 if __name__ == "__main__":
    import preprocessing.cleaned_data.create_cleaned_data_table as ccdt
    catchments = ccdt.get_attributes_catchments()
