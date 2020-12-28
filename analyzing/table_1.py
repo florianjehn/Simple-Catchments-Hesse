@@ -36,7 +36,7 @@ def calculate_p_values(catchments, obj_func):
         all_data_attribute = pd.concat(collect,ignore_index=True)
         
         # Calculate the p-values
-        bonferoni_p_val_correction = 24
+        bonferoni_p_val_correction = 23
         # Categorical Attribute
         if all_data_attribute[attribute].dtype != float:
             values_per_group = [col.dropna() for col_name, col in all_data_attribute.groupby(attribute)["catchment_obj_func"]]

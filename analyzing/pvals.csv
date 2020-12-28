@@ -4,7 +4,7 @@ Discharge [mm];< 0.0001;
 Precipitation [mm];< 0.0001;
 Runoff-Ratio [/];< 0.0001;
 Land Use [/];;< 0.0001
-Area [km²];0.01;
+Area [km²];< 0.01;
 Elongation Ratio [/];< 0.0001;
 Slope [/];< 0.0001;
 Soil Depth [m];1;
