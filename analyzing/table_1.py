@@ -37,7 +37,7 @@ def calculate_p_values(catchments, obj_func):
         
         # Calculate the p-values
         bonferoni_p_val_correction = 23
-        # Categorical Attribute
+        # Categorical Attributes
         if all_data_attribute[attribute].dtype != float:
             values_per_group = [col.dropna() for col_name, col in all_data_attribute.groupby(attribute)["catchment_obj_func"]]
             statistic, pval = scipy.stats.f_oneway(*values_per_group)
