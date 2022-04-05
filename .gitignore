@@ -19,3 +19,5 @@ preprocessing/reformat_data/__pycache__/et_correction.cpython-37.pyc
 analyzing/kge_all_years_catch - Kopie.csv
 preprocessing/cleaned_data/__pycache__/create_cleaned_data_table.cpython-37.pyc
 *.tiff
+preprocessing/cleaned_data/dis_mm_1991_2018.csv
+*.pyc
