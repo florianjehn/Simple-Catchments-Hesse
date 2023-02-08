@@ -51,8 +51,30 @@ def read_df(name):
     df = pd.read_csv(name, sep=";", index_col=0)
     df.index = pd.to_datetime(df.index, format='%Y-%m-%d')
     return df
-    
-       
+
+
+def remove_whitespace(data):
+    for i in data.columns:
+        # checking datatype of each columns
+        if data[i].dtype == 'object':
+            # applying strip function on column
+            data[i] = data[i].map(str.strip)
+    return data
+
+
+def match_duplicates(data, col):
+    """
+    unique soil types are
+    ['Dystric Cambisols', 'Eutric Cambisols / Stagnic Gleysols', 'Eutric Cambisols',
+     'Haplic Luvisols / Eutric Podzoluvisols / Stagnic Gleysols', 'Spodic Cambisols', 'Spodic Cambisol']
+
+     'Spodic Cambisols' is the same as 'Spodic Cambisol', so an additional 's' is needed
+    """
+
+    data[col] = np.where(data[col].str[-1] != "s", data[col] + "s", data[col])
+    return data
+
+
 # Get the data, add some and sort it
 att_df = read_attributes()
 att_df = calculate_elongation(att_df)
@@ -76,11 +98,18 @@ for item in cleaned_cat:
         cleaned_num.append(item[:-4])
     else:
         cleaned_num.append(item)
-    
-# Go the the cleaned data folder
+
+
+clean_att_df = att_df[cleaned_num].copy()
+# remove redundant whitespace
+clean_att_df = remove_whitespace(clean_att_df)
+# make sure ever soil type ends with an "s" to prevent duplicates
+clean_att_df = match_duplicates(clean_att_df, "dominating_soil_type_bk500")
+
+# Go to the cleaned data folder
 os.chdir(os.path.abspath(os.path.join(file_dir, os.pardir+os.sep))+os.sep+"cleaned_data")
 # Save
-att_df[cleaned_num].to_csv("cleaned_catchment_attributes_num.csv", sep=";")
+clean_att_df.to_csv("cleaned_catchment_attributes_num.csv", sep=";")
 
 
 
